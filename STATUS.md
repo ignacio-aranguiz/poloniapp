@@ -11,6 +11,7 @@ Web app informativa (MVP) para un centro cultural del O. — capa de identidad, 
 - **Repo:** https://github.com/ignacio-aranguiz/poloniapp (público, requerido por GitHub Pages free)
 - Fuente: `main` / `docs` — mismo patrón que `consuelo-hr`.
 - Contenido actual: `docs/index.html` es el HTML standalone (v0) generado con Claude Design a partir de `DESIGN_BRIEF.md` — mockup visual, sin datos reales ni backend.
+- Responsivo mobile corregido (2026-08-16): el export original tenía un marco de teléfono fijo para desktop que desbordaba en celulares reales. Se rehizo directamente en Claude Design (layout apilado y centrado con container query, sin depender de media queries) y se re-exportó. Verificado en producción con viewport de 375px.
 
 ## Próximos pasos
 - Revisar/iterar el mockup v0 con el equipo del centro.
