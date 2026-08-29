@@ -26,11 +26,19 @@ Log vivo de decisiones de diseño, UX/UI y estructura de contenido tomadas en se
 ### Sección "Textos diarios"
 - Se agrega como card/preview que redirige afuera a opusdei.org/es-cl/dailytext — mismo patrón ya definido para publicaciones de O. (sin vista de detalle propia, sin scraping).
 
-### Taxonomía de actividades — **pendiente de cerrar**
-Hay dos listas que todavía no se reconciliaron:
-- **Stories (misión/visión):** Preparatorio, Profesional, Meditaciones, Dirección espiritual, Catequesis, Retiro mensual, Curso de retiro, Visitas a los pobres, Colectas (**excluir** Vela al Santísimo — no aplica).
-- **Feedback de Joaquín Camus (WhatsApp):** Círculos, Retiros (mensual/anual), Confesiones, Charlas de formación, Charlas profesionales, Publicaciones.
-- Joaquín también aportó datos reales de Círculos (8 instancias: día, hora, sede, persona a cargo) y el patrón de navegación por drill-down (categoría → lista semanal → detalle con horario/contacto), que se usará donde tenga sentido a nivel UX (categorías con múltiples instancias recurrentes) — no necesariamente en todas.
+### Taxonomía de actividades — **cerrada (2026-08-29, ronda 2)**
+Categorías top-level definitivas para v1:
+1. **Círculos** (fusiona Preparatorio + Profesional de las stories) — con las 8 instancias reales de Joaquín (día, hora, sede, persona a cargo)
+2. **Retiros** (ej. Retiro de Agosto)
+3. **Confesiones**
+4. **Charlas de formación** (ej. Catolicismo Ciclo 2, Meditaciones, Dirección espiritual, Catequesis)
+5. **Charlas profesionales** (ej. Optimal Work)
+6. **Matrimonio y Familia** (Encuentro de Matrimonios + Jornada Matrimonio y Familia anual — **no** va dentro de Retiros, es su propia categoría)
+7. **Publicaciones** (redirige afuera, sin vista de detalle propia)
+
+Además, **Visitas a los pobres de la Virgen** y **Colectas** se incluyen como categorías visibles aunque todavía no tengan contenido real cargado (categoría vacía, se puebla más adelante).
+
+Patrón de navegación por drill-down (categoría → lista de instancias → detalle con horario/contacto), aportado por Joaquín, se usa donde tenga sentido a nivel UX — categorías con múltiples instancias recurrentes.
 
 ### Contenido real recolectado (actividades)
 Extraído de `Polonia.docx` + PDFs + posters compartidos:
@@ -46,8 +54,14 @@ Extraído de `Polonia.docx` + PDFs + posters compartidos:
 - Matrimonios/familias **sí entra** en el alcance de poloniapp — mismo centro/segmento que profesionales jóvenes, aunque el público puntual de esas actividades sea distinto.
 - Modelo de datos debe soportar **ambos formatos**: evento simple (1 sesión) y serie (N sesiones fechadas con tema/expositor propio bajo un mismo nombre de actividad).
 
+### Símbolo oficial — integrado
+- Se trabajó `SYMBOL_BRIEF.md` + `rings-reference.png` directamente en Claude Design (Opus 5, esfuerzo medio). Resultado: nuevo export standalone con el símbolo de anillos concéntricos integrado al header.
+- Mantiene `Caprasimo`/`Figtree` y casi toda la paleta original (`#D85A30`, `#C88A3D`, `#2C2C2A`, `#f5ead8`, `#faf9f5`).
+- Se sumó un color nuevo, `#6E2F35` (burdeo oscuro), no estaba en la paleta original del `DESIGN_BRIEF.md` — probablemente para el símbolo. A confirmar si se documenta como ampliación oficial de paleta.
+- `docs/index.html` reemplazado con este export (2026-08-29) y deployado a producción.
+
 ### Backup
-- Antes de empezar a modificar `docs/index.html` para la v1, se taggeó el estado actual del repo como respaldo del v0 (ver tag de git) — la v1 se construye sobre el mismo repo, manteniendo la URL de GitHub Pages por ahora.
+- Antes de empezar a modificar `docs/index.html` para la v1, se taggeó el estado actual del repo como respaldo del v0 (tag `v0-mockup-backup`) — la v1 se construye sobre el mismo repo, manteniendo la URL de GitHub Pages por ahora.
 
 ### Pendiente para próximas rondas
 - Cerrar taxonomía definitiva de categorías de actividades.
