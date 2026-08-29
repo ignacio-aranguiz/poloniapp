@@ -41,8 +41,20 @@ Los 3 chips actuales del Home (`todas · formación/espiritual · trabajo/labora
 
 Usá tu criterio de motion/layout para la transición de aparición de la sub-fila (no tiene que ser instantánea ni brusca) — mantené el mismo lenguaje visual de los chips actuales (pill, mismo tratamiento on/off).
 
+## Parte 3 — Fotos nuevas + placeholder estándar
+
+Dos fotos más, mismo criterio que las 3 anteriores (afiches reales, con texto propio, tratalos igual — recorte/posición a tu criterio):
+- `docs/assets/activities/optimal-work.jpg` → actividad `id:4` (Optimal Work) — es la portada del PDF del programa.
+- `docs/assets/activities/jornada-matrimonio-familia.jpg` → actividad `id:7` (Jornada Matrimonio y Familia) — es la portada del PDF de invitación.
+
+Con esto, de las 7 actividades reales, solo **Círculos (`id:1`, `id:2`)** quedan sin foto propia.
+
+**Placeholder estándar (reemplaza el rayado `.ph washed`):** para las actividades sin foto, en vez del patrón rayado con texto ("foto círculo"), usar el símbolo de poloniapp como imagen de placeholder — `docs/assets/poloniapp-symbol.svg` (mismo mark que ya está en el header, mismos colores). Centrado, con margen/padding generoso (no a sangre, se ve mal un símbolo circular estirado a los bordes de una tarjeta cuadrada) y fondo neutro (`var(--color-neutral-200)` o similar, ya usado en el mismo componente).
+
+**Orden del grid de Home:** dado que Círculos ahora son las únicas actividades sin foto propia, en el grid de Home (`cards`, las primeras 6 que se muestran) estas deberían aparecer **más abajo**, no arrancando el grid — para que las primeras tarjetas que ve alguien entrando por primera vez tengan foto real. Reordená `ACTS` (o el slice que arma `cards`) así los ids 1 y 2 (Círculos) queden al final de lo que se muestra en Home, sin sacarlos de la lista completa de Actividades.
+
 ## Qué se necesita como resultado
 1. Actividades como grilla de 7 categorías (con 3 vacías en estado "próximamente") → drill-down a lista por fecha → detalle (reutiliza lo ya construido).
 2. Chips de Home con el comportamiento de carpetas de 2 niveles descrito arriba.
-3. No toques wording, fotos, símbolo ni paleta — ya están resueltos.
+3. No toques wording ni paleta — ya están resueltos. Fotos y placeholder sí se tocan en esta ronda (Parte 3).
 4. Guardar como HTML standalone, igual que las veces anteriores.
