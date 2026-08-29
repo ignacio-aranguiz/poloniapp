@@ -61,6 +61,11 @@ Extraído de `Polonia.docx` + PDFs + posters compartidos:
 - La grilla de Actividades queda en **7 categorías estrictas** (no 9): Círculos, Retiros, Confesiones, Charlas de formación, Charlas profesionales, Matrimonio y Familia, Publicaciones.
 - **Nota de proceso:** estas descripciones de categoría se redactaron en esta conversación pero no se habían entregado a Claude Design como parte de `NAVIGATION_BRIEF.md` — quedaron solo documentadas acá. Se le pasaron recién en la ronda de ajustes por chat (2026-08-29, tarde), junto con el resto de los ajustes (grilla 7 estricta, prefiltrado formación/espiritual, fotos de publicaciones).
 
+### NAVIGATION_BRIEF.md — integrado y deployado (2026-08-29, ronda 6)
+- Grilla de Actividades en 7 categorías con drill-down, chips progresivos en Home (prefiltrado en "formación/espiritual" al abrir, sub-chips desplegados), Círculos con placeholder de símbolo, Optimal Work y Jornada Matrimonio y Familia con foto propia.
+- **Bug encontrado y corregido antes del deploy:** las fotos de publicaciones dependían de `window.POLONIA_PHOTOS`, que el export nunca define (a diferencia de las fotos de actividades, que sí tienen fallback a `assets/activities/*.jpg`). Se agregó `postSrc()` con el mismo patrón de fallback, apuntando a `assets/posts/*.jpg` — sin esto las publicaciones hubieran caído al placeholder en producción pese a que Claude Design reportó el problema resuelto.
+- Verificado con el mismo script de extracción/reempaquetado de siempre antes de pushear: wording intacto, assets referenciados existen en el repo, Visitas/Colectas ausentes del HTML.
+
 ### Navegación por categoría — decidida (2026-08-29, ronda 4)
 - **Actividades** pasa de agrupamiento por fecha a **grilla de las 7 categorías** (drill-down categoría → lista por fecha → detalle). Motivo: Círculos son recurrentes sin fecha absoluta y no encajan en "esta semana/próximo mes"; Jornada Matrimonio y Familia es anual y quedaba forzada en un cubo temporal falso; la intención de búsqueda real es por tipo, no por fecha.
 - **Chips del Home**: se mantienen los 3 buckets amplios (formación/espiritual, trabajo/laboral, familia) pero con interacción de "carpetas" — tocar un bucket amplio filtra y despliega sus sub-chips de categoría específica debajo; un solo grupo abierto a la vez (decisión tomada por espacio en mobile, no multi-grupo simultáneo).

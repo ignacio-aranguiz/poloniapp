@@ -1,6 +1,6 @@
 # STATUS — poloniapp
 
-**Fase:** iteración-v1 en curso (contenido real, símbolo y publicaciones ya integrados; navegación por categoría en curso con Claude Design; falta backend/portal admin)
+**Fase:** iteración-v1 — navegación por categoría deployada (contenido real, símbolo, publicaciones y grilla de categorías ya en producción; falta backend/portal admin y "Textos diarios")
 **Madurez:** 2/5
 
 ## Qué es
@@ -12,15 +12,6 @@ Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 
 - Fuente: `main` / `docs`.
 - **Backup del v0** (antes de toda la iteración v1) disponible en el tag de git `v0-mockup-backup`.
 
-## ⏳ EN CURSO — leer esto primero al retomar
-Se le pidió a Claude Design (sesión "PoloniApp" en claude.ai/design) implementar `NAVIGATION_BRIEF.md`: grilla de 7 categorías en Actividades (drill-down) + chips progresivos en Home + fotos de Optimal Work/Jornada + símbolo como placeholder. Sobre la marcha se sumaron ajustes por chat directo con Claude Design (no están en el `.md` original, quedan solo acá):
-- Grid de categorías: **7 estrictas**, no 9 — Visitas a los pobres y Colectas quedan **ocultas** (no como "próximamente"). Ver sección de abajo.
-- Círculos: sacar la mención al paso interno de preparatorio → profesional.
-- Se le pasaron las 3 fotos de `docs/assets/posts/` (no habían llegado en la ronda anterior).
-- Se pidió dejar el Home **prefiltrado en "formación/espiritual"** al abrir la app (cambia el default `todas` del `DESIGN_BRIEF.md` original — ver nota de trade-off en `DECISIONS.md`).
-
-**Al retomar: pedirle a Ignacio el HTML que haya devuelto Claude Design con todo esto, integrarlo (mismo proceso que las rondas anteriores — verificar con el script de extracción/reempaquetado, no pisar wording), y recién ahí commit + push.**
-
 ## Qué ya está integrado y en producción
 - Responsivo mobile (2026-08-16).
 - Símbolo propio de anillos concéntricos, reemplaza el símbolo de O. (`SYMBOL_BRIEF.md`, ya ejecutado).
@@ -28,6 +19,7 @@ Se le pidió a Claude Design (sesión "PoloniApp" en claude.ai/design) implement
 - 7 actividades reales cargadas con fotos propias (5 de 7 tienen foto; Círculos ×2 quedan con placeholder — se resuelve con símbolo en la ronda en curso).
 - Binding de fotos completo en grid Home / lista Actividades / detalle (`PHOTOS_BRIEF.md`, ya ejecutado).
 - 3 publicaciones de O. reales (título e imagen extraídos de opusdei.org por fetch directo), con link a la URL real del artículo.
+- **Navegación por categoría (2026-08-29, `NAVIGATION_BRIEF.md`, ya ejecutado):** Actividades es grilla de 7 categorías con drill-down (ya no agrupa por fecha). Home con chips progresivos, prefiltrado en "formación/espiritual" al abrir. Visitas a los pobres/Colectas ocultas (texto listo en `DECISIONS.md` para reactivar). Círculos con placeholder de símbolo; las otras 6 actividades reales ya tienen foto propia (incluye Optimal Work y Jornada Matrimonio y Familia).
 
 ## Wording — qué falta todavía (auditoría 2026-08-29)
 - **"Todo te recarga"** — frase de cierre de las stories, sin lugar asignado aún.
