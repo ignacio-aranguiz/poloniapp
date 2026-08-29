@@ -8,7 +8,9 @@ Reemplazar el placeholder de "símbolo oficial de O." del header (pendiente en e
 ## Qué representa el símbolo (para que la exploración no pierda el sentido)
 Los "3 anillos" de San Josemaría: que busques a Cristo, que encuentres a Cristo, que ames a Cristo. En el material de referencia se ven como 3 anillos concéntricos incompletos (con una apertura, como un trazo que gira), cada uno de un color distinto, con un ícono/marca al centro. Cierre conceptual: "los anillos los completas tú... con Dios".
 
-Referencia visual entregada por el centro (ver adjuntos de la sesión — capturas de Instagram stories): fondo navy oscuro, anillos en verde-menta / amarillo-lima / magenta, trazo grueso con terminación tipo "coma" (no un círculo perfecto cerrado).
+Referencia visual entregada por el centro (ver adjuntos de la sesión — capturas de Instagram stories, y `rings-reference.png` en esta misma carpeta): fondo navy oscuro, anillos en verde-menta / amarillo-lima / magenta, trazo grueso con terminación tipo "coma" (no un círculo perfecto cerrado), ícono "+" al centro.
+
+**Nota de calidad de la referencia:** `rings-reference.png` es de baja resolución (265×248px, screenshot de screenshot). Usarla solo como referencia conceptual de forma/color/proporciones — el símbolo final debe generarse limpio (vectorial o alta resolución), no como upscale de ese archivo.
 
 **Importante:** esa paleta (navy + menta/lima/magenta) es la del material original de O., **no** la paleta de poloniapp. Hay que adaptar el símbolo a la paleta propia (ver abajo), no calcarlo tal cual.
 
