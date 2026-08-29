@@ -54,6 +54,18 @@ Extraído de `Polonia.docx` + PDFs + posters compartidos:
 - Matrimonios/familias **sí entra** en el alcance de poloniapp — mismo centro/segmento que profesionales jóvenes, aunque el público puntual de esas actividades sea distinto.
 - Modelo de datos debe soportar **ambos formatos**: evento simple (1 sesión) y serie (N sesiones fechadas con tema/expositor propio bajo un mismo nombre de actividad).
 
+### Wording del hero — corregido (2026-08-29, ronda 3)
+El primer wording del hero ("Un lugar para crecer, con gente que te acompaña." → luego "Acompañamos tu vida cristiana, en medio de lo de todos los días.") no sirvió: leía a marketing/autoayuda genérica. No es eso — es una invitación a ampliar horizontes vía medios de formación concretos, no un programa de bienestar personal.
+- **H1 final (cita textual, San Josemaría):** "Que busques a Cristo, que encuentres a Cristo, que ames a Cristo."
+- **Subtítulo final (cita textual, "1 objetivo" de las stories):** "Buscar a Dios en la vida ordinaria, y darlo a conocer."
+- Regla para el resto del copy: preferir texto literal del material de la O. ya recolectado por sobre paráfrasis propia.
+
+### Fotos reales de actividades — integradas
+- 3 fotos reales bajadas del Google Drive del centro (carpeta compartida) y guardadas en `docs/assets/activities/`: `catolicismo-ciclo2.jpg`, `encuentro-matrimonios-sept.jpg`, `retiro-agosto.jpg`. Son afiches de difusión reales (con texto propio superpuesto), no fotos genéricas.
+- Se completó el binding de foto por actividad en los 3 lugares del template (grid de Home, lista de Actividades, portada de Detalle) vía `PHOTOS_BRIEF.md` + Claude Design — antes solo el grid de Home leía `a.img`; lista y detalle estaban hardcodeados a un texto placeholder.
+- Actividades sin foto real todavía (Círculos ×2, Optimal Work, Jornada Matrimonio y Familia) siguen mostrando el placeholder rayado `.ph washed`.
+- Nota de proceso: el primer export de esta ronda vino de una versión de `docs/index.html` **anterior** al fix de wording (Claude Design trabajó sobre un upload viejo) — se fusionó manualmente el binding de fotos nuevo con el wording correcto antes de integrar, sin perder ninguno de los dos.
+
 ### Símbolo oficial — integrado
 - Se trabajó `SYMBOL_BRIEF.md` + `rings-reference.png` directamente en Claude Design (Opus 5, esfuerzo medio). Resultado: nuevo export standalone con el símbolo de anillos concéntricos integrado al header.
 - Mantiene `Caprasimo`/`Figtree` y casi toda la paleta original (`#D85A30`, `#C88A3D`, `#2C2C2A`, `#f5ead8`, `#faf9f5`).

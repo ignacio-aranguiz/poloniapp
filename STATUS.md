@@ -13,6 +13,8 @@ Web app informativa (MVP) para un centro cultural del O. — capa de identidad, 
 - Contenido actual: `docs/index.html` es el HTML standalone (v0) generado con Claude Design a partir de `DESIGN_BRIEF.md` — mockup visual, sin datos reales ni backend.
 - Responsivo mobile corregido (2026-08-16): el export original tenía un marco de teléfono fijo para desktop que desbordaba en celulares reales. Se rehizo directamente en Claude Design (layout apilado y centrado con container query, sin depender de media queries) y se re-exportó. Verificado en producción con viewport de 375px.
 - Símbolo oficial integrado (2026-08-29): se reemplazó el placeholder de símbolo de O. por el mark propio de anillos concéntricos (brief en `SYMBOL_BRIEF.md`, referencia en `rings-reference.png`), trabajado en Claude Design y re-exportado. Mantiene tipografía (`Caprasimo`/`Figtree`) y casi toda la paleta original; se sumó un acento nuevo `#6E2F35`.
+- Wording del hero corregido (2026-08-29): texto literal del material de la O. en vez de paráfrasis tipo autoayuda — ver `DECISIONS.md`.
+- Fotos reales de 3 actividades integradas (2026-08-29): binding completo en grid de Home, lista de Actividades y portada de Detalle. Assets en `docs/assets/activities/`.
 - Backup del v0 pre-iteración disponible en el tag de git `v0-mockup-backup`.
 
 ## Próximos pasos
