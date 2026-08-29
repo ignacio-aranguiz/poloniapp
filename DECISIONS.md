@@ -54,6 +54,12 @@ Extraído de `Polonia.docx` + PDFs + posters compartidos:
 - Matrimonios/familias **sí entra** en el alcance de poloniapp — mismo centro/segmento que profesionales jóvenes, aunque el público puntual de esas actividades sea distinto.
 - Modelo de datos debe soportar **ambos formatos**: evento simple (1 sesión) y serie (N sesiones fechadas con tema/expositor propio bajo un mismo nombre de actividad).
 
+### Navegación por categoría — decidida (2026-08-29, ronda 4)
+- **Actividades** pasa de agrupamiento por fecha a **grilla de las 7 categorías** (drill-down categoría → lista por fecha → detalle). Motivo: Círculos son recurrentes sin fecha absoluta y no encajan en "esta semana/próximo mes"; Jornada Matrimonio y Familia es anual y quedaba forzada en un cubo temporal falso; la intención de búsqueda real es por tipo, no por fecha.
+- **Chips del Home**: se mantienen los 3 buckets amplios (formación/espiritual, trabajo/laboral, familia) pero con interacción de "carpetas" — tocar un bucket amplio filtra y despliega sus sub-chips de categoría específica debajo; un solo grupo abierto a la vez (decisión tomada por espacio en mobile, no multi-grupo simultáneo).
+- Mapeo bucket → categorías: formación/espiritual = Círculos, Retiros, Confesiones, Charlas de formación, Visitas a los pobres, Colectas · trabajo/laboral = Charlas profesionales · familia = Matrimonio y Familia. Publicaciones queda fuera del esquema de filtros.
+- Brief entregado a Claude Design: `NAVIGATION_BRIEF.md`.
+
 ### Wording del hero — corregido (2026-08-29, ronda 3)
 El primer wording del hero ("Un lugar para crecer, con gente que te acompaña." → luego "Acompañamos tu vida cristiana, en medio de lo de todos los días.") no sirvió: leía a marketing/autoayuda genérica. No es eso — es una invitación a ampliar horizontes vía medios de formación concretos, no un programa de bienestar personal.
 - **H1 final (cita textual, San Josemaría):** "Que busques a Cristo, que encuentres a Cristo, que ames a Cristo."
