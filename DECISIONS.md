@@ -54,6 +54,12 @@ Extraído de `Polonia.docx` + PDFs + posters compartidos:
 - Matrimonios/familias **sí entra** en el alcance de poloniapp — mismo centro/segmento que profesionales jóvenes, aunque el público puntual de esas actividades sea distinto.
 - Modelo de datos debe soportar **ambos formatos**: evento simple (1 sesión) y serie (N sesiones fechadas con tema/expositor propio bajo un mismo nombre de actividad).
 
+### Descripciones de categoría — cerradas (2026-08-29, ronda 5)
+- **Círculos, Retiros, Charlas de formación**: texto tomado literal (recortado/unido) de las stories de misión/visión. Ojo: en Círculos **no** se menciona el paso interno de preparatorio a profesional — se sacó del copy final, es un detalle interno del centro, no de cara al usuario.
+- **Confesiones, Charlas profesionales, Matrimonio y Familia**: sin párrafo propio en las stories — el copy se apoya en el contenido real de actividades ya cargadas (Retiro de Agosto para Confesiones, Optimal Work para Charlas profesionales, Encuentro de Matrimonios/Jornada para Matrimonio y Familia), no es cita textual de la O.
+- **Visitas a los pobres de la Virgen y Colectas — ocultas por ahora** (revierte la decisión anterior de "categoría vacía visible"). Ya tenemos el texto literal de las stories listo para cuando se activen: Visitas = "Aprendés a ver a Cristo en el prójimo, con contacto inmediato y personal con el sufrimiento"; Colectas = "Una manera de dar de lo tuyo para colaborar con las necesidades del centro y del voluntariado". **No perder este texto** — están listas para reactivar apenas haya decisión de mostrarlas.
+- La grilla de Actividades queda en **7 categorías estrictas** (no 9): Círculos, Retiros, Confesiones, Charlas de formación, Charlas profesionales, Matrimonio y Familia, Publicaciones.
+
 ### Navegación por categoría — decidida (2026-08-29, ronda 4)
 - **Actividades** pasa de agrupamiento por fecha a **grilla de las 7 categorías** (drill-down categoría → lista por fecha → detalle). Motivo: Círculos son recurrentes sin fecha absoluta y no encajan en "esta semana/próximo mes"; Jornada Matrimonio y Familia es anual y quedaba forzada en un cubo temporal falso; la intención de búsqueda real es por tipo, no por fecha.
 - **Chips del Home**: se mantienen los 3 buckets amplios (formación/espiritual, trabajo/laboral, familia) pero con interacción de "carpetas" — tocar un bucket amplio filtra y despliega sus sub-chips de categoría específica debajo; un solo grupo abierto a la vez (decisión tomada por espacio en mobile, no multi-grupo simultáneo).
