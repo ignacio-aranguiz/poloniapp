@@ -33,6 +33,13 @@ Con esto queda cerrada la Fase 2 completa (2a+2b+2c). Pendiente: swap `docs/prev
 
 Con esto el panel admin queda completo para todo lo que ya existe en el sitio — solo faltan Fase 4 (inscripciones) y Fase 5 (scraper), que van a agregar contenido nuevo a tablas que el admin ya sabe leer/escribir donde corresponde.
 
+### Fase 5 — pivot: scraper automático no viable, carga manual — **actualiza la Ronda 7**
+Al construir el scraper (Node + fetch nativo + GitHub Actions cron, según lo planificado) se encontró que `opusdei.org` corre atrás de Cloudflare con un challenge JS activo (`cf-mitigated: challenge`) en **todas** las rutas probadas: la página del texto diario, `/feed`, `/rss.xml`. Un `fetch`/`curl` simple nunca lo pasa, sea desde local o desde un runner de GitHub Actions — no es un tema de headers/user-agent, es protección anti-bot real. Se descartó explícitamente cualquier intento de evadirla (headless browser resolviendo el challenge, rotación de IPs), independiente de si fuera técnicamente posible.
+
+**Resolución:** "Texto diario" pasa de "solo lectura, lo llena el scraper" a formulario editable en el admin — mismo patrón que ya se usaba para Publicaciones (que de hecho también era carga manual desde el origen, no automática: las 3 publicaciones iniciales se cargaron a mano investigando en opusdei.org). Toma ~1 minuto por día si alguien quiere mantenerlo al día. La vista "Texto diario" en la Home pública (excerpt + link "leer completo", sin detalle propio) se construyó igual — el pivot es solo en cómo llega el dato a la tabla, no en el diseño de la vista.
+
+Se quita también el badge "sync diario" de Publicaciones en la Home, porque ya no describe la realidad (nunca fue automático, y ahora es explícito que no lo es).
+
 ---
 
 ## 2026-08-30 — Ronda 7: plan de backend, panel admin y jobs de contenido

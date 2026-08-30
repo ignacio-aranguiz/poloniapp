@@ -36,8 +36,8 @@ Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-p
 - **Fase 2 completa**, viendo en `/preview/` (no en la raíz todavía, ver nota de deploy abajo).
 - **✅ Fase 3 — Panel admin completo:** `docs/admin/`, Supabase Auth (email+password) + allowlist `admins`. 7 pestañas: Contenido fijo, Categorías, Actividades (con sesiones anidadas), Ubicaciones, Publicaciones, Texto diario (solo lectura), Inscripciones (solo lectura). Upload real de imágenes a Supabase Storage (bucket `site-images`) en los 3 campos de foto (Quiénes somos, actividades, publicaciones).
 - **Manual para admins:** `docs/manual/` (endpoint público, con capturas reales), explica cómo entrar, editar texto, subir imagen, ver el resultado.
-- **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend).
-- **Pendiente Fase 5:** scraper opusdei.org (GitHub Actions) → habilita "Textos diarios" con contenido real.
+- **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend) — a la espera de feedback de los otros admins (reunión en ~2 semanas, 2026-09-13).
+- **✅ Fase 5 (pivot):** el scraper automático no es viable — opusdei.org corre atrás de Cloudflare con challenge JS en todas las rutas (sitio, /feed, /rss.xml). "Texto diario" pasa a carga manual desde el admin (mismo patrón que Publicaciones), con su sección ya viva en la Home pública.
 - **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo). Swap a la raíz pendiente de decisión explícita.
 
 ## Próximos pasos (no wording)
