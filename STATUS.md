@@ -1,18 +1,22 @@
 # STATUS — poloniapp
 
-**Fase:** iteración-v1 → backend/data-driven en construcción (2026-08-30): Supabase creado y Home data-driven ya funcionando en `/preview/`, pendientes 2b-2c (navegación completa) + panel admin + scraper
-**Madurez:** 2/5
+**Fase:** iteración-v1 → backend/data-driven (2026-08-30): Fases 1, 2 (a+b+c), 3 y 5 completas y viendo en `/preview/` + `/admin/`; pendiente Fase 4 (inscripciones, bloqueada por feedback de otros admins) y el swap a la raíz
+**Madurez:** 3/5
 
 ## Qué es
-Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 306) — capa de identidad, feed de actividades propias por categoría (con detalle propio) + sección secundaria de publicaciones de O. (redirige afuera) + sección "Textos diarios" (pendiente de implementar, redirige afuera) + bubble chat de contacto que redirige a WhatsApp. Ver `PROJECT_BRIEF.md` para el scope original y `DESIGN_BRIEF.md` para la arquitectura de información y paleta visual del v0. **`DECISIONS.md` es la fuente de verdad de todo lo que cambió sobre esos dos documentos durante la iteración v1** — leerlo siempre antes de asumir el estado del contenido/UX.
+Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 306) — capa de identidad, feed de actividades propias por categoría (con detalle propio) + sección secundaria de publicaciones de O. (redirige afuera) + sección "Texto diario" (redirige afuera) + tarjeta de reserva de Confesiones (redirige a Setmore) + bubble chat de contacto a WhatsApp. Ver `PROJECT_BRIEF.md` para el scope original y `DESIGN_BRIEF.md` para la arquitectura de información y paleta visual del v0. **`DECISIONS.md` es la fuente de verdad de todo lo que cambió sobre esos dos documentos durante la iteración v1** — leerlo siempre antes de asumir el estado del contenido/UX.
 
 ## Deploy
-- **URL:** https://ignacio-aranguiz.github.io/poloniapp/
+- **Producción (bundle viejo, sin tocar todavía):** https://ignacio-aranguiz.github.io/poloniapp/
+- **Preview (build nuevo, data-driven):** https://ignacio-aranguiz.github.io/poloniapp/preview/
+- **Panel admin:** https://ignacio-aranguiz.github.io/poloniapp/admin/ (login Supabase Auth)
+- **Manual para admins:** https://ignacio-aranguiz.github.io/poloniapp/manual/
 - **Repo:** https://github.com/ignacio-aranguiz/poloniapp (público, requerido por GitHub Pages free)
 - Fuente: `main` / `docs`.
+- **Backend:** Supabase, proyecto `poloniapp` (São Paulo) — URL y keys en `docs/assets/js/config.js` (anon, pública) y en Supabase dashboard (service_role, nunca en el repo).
 - **Backup del v0** (antes de toda la iteración v1) disponible en el tag de git `v0-mockup-backup`.
 
-## Qué ya está integrado y en producción
+## Qué ya está integrado y en producción (raíz — bundle viejo)
 - Responsivo mobile (2026-08-16).
 - Símbolo propio de anillos concéntricos, reemplaza el símbolo de O. (`SYMBOL_BRIEF.md`, ya ejecutado).
 - Wording real en hero, Quiénes somos y actividades — cita textual del material de la O. donde existe, ver `DECISIONS.md`.
@@ -42,13 +46,14 @@ Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-p
 - **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo). Swap a la raíz pendiente de decisión explícita.
 
 ## Próximos pasos (no wording)
-- Seguir el plan de backend/admin/scraper de arriba: 2b → 2c → swap a raíz → Fase 3 → Fase 4 → Fase 5.
-- Conseguir del equipo del centro: link real de WhatsApp (el botón hoy no tiene destino).
+- Fase 4 (inscripciones) — retomar después de la reunión con los otros admins (~2026-09-13).
+- Swap `docs/preview/` → raíz cuando el usuario lo decida explícitamente.
 - Implementar tracking de clics en bubble chat (recomendación del brief original: Google Sheets vía Apps Script Web App).
 - Reactivar Visitas a los pobres / Colectas cuando haya decisión — el texto ya está listo en `DECISIONS.md`, no reinventar.
 
 ## Blockers
-- Ninguno bloqueante — falta ejecutar el plan de backend (arriba) y el link de WhatsApp real.
+- **Fase 4 (inscripciones):** bloqueada a propósito — el usuario quiere feedback de los otros admins del centro antes de definir el flujo, se juntan ~2026-09-13.
+- Nada más bloqueante — el link de WhatsApp ya se cargó (+56953719944).
 
 ## Documentos del proyecto — qué es cada uno
 - `PROJECT_BRIEF.md` — brief de producto original (v0).
@@ -56,7 +61,10 @@ Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-p
 - `DECISIONS.md` — **fuente de verdad viva** de toda decisión de diseño/UX/contenido tomada durante la iteración v1, ronda por ronda. Leer siempre primero.
 - `SYMBOL_BRIEF.md` — brief del símbolo de anillos (ya ejecutado).
 - `PHOTOS_BRIEF.md` — brief del binding de fotos de actividades (ya ejecutado).
-- `NAVIGATION_BRIEF.md` — brief de navegación por categoría + chips progresivos + fotos/placeholder (**en curso**, ver arriba los ajustes que no están en el archivo).
+- `NAVIGATION_BRIEF.md` — brief de navegación por categoría + chips progresivos + fotos/placeholder (ya ejecutado, integrado también en el frontend nuevo data-driven).
 - `journey-centro-cultural.svg` — journey to-be original.
 - `rings-reference.png` — referencia visual del símbolo (baja resolución, solo conceptual).
-- `docs/assets/` — assets reales del sitio: `activities/` (fotos de actividades), `posts/` (fotos de publicaciones de O.), `poloniapp-symbol.svg` (símbolo standalone).
+- `docs/assets/` — assets reales del sitio: `activities/` (fotos de actividades), `posts/` (fotos de publicaciones de O.), `poloniapp-symbol.svg` (símbolo standalone), `css/`+`js/` (frontend data-driven nuevo).
+- `supabase/schema.sql` — schema completo (tablas, RLS, RPC) del backend, fuente de verdad del modelo de datos.
+- `supabase/seed.sql` — contenido inicial migrado a Supabase (no re-correr entero: los inserts de actividades/sesiones no tienen `on conflict`, duplicarían datos).
+- `docs/admin/`, `docs/preview/`, `docs/manual/` — panel admin, build nuevo del sitio, y manual para admins (ver sección Deploy).
