@@ -1,0 +1,83 @@
+/* poloniapp admin — panel simple, no reusa el layout mobile del sitio público. */
+
+:root {
+  --color-primary: #D85A30;
+  --color-ink: #2C2C2A;
+  --color-cream: #f5ead8;
+  --color-paper: #faf9f5;
+  --color-border: #e3d9c4;
+  --font-body: 'Figtree', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.admin-shell { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.admin-header h1 { font-size: 1.2rem; margin: 0; }
+.admin-header .who { font-size: 0.8rem; color: #8a8a84; }
+.btn-link {
+  background: none; border: none; color: var(--color-primary);
+  font-size: 0.85rem; cursor: pointer; padding: 0; font-family: var(--font-body);
+}
+
+/* --- Login --- */
+.login-box {
+  max-width: 360px;
+  margin: 80px auto;
+  background: var(--color-cream);
+  border-radius: 16px;
+  padding: 28px;
+}
+.login-box h1 { font-size: 1.1rem; margin: 0 0 16px; }
+.login-box label { display: block; font-size: 0.8rem; margin: 12px 0 4px; color: #6b6b66; }
+.login-box input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--color-border);
+  border-radius: 10px; font-size: 0.9rem; font-family: var(--font-body);
+}
+.login-box button {
+  margin-top: 18px; width: 100%; padding: 11px; border: none; border-radius: 10px;
+  background: var(--color-primary); color: #fff; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+}
+.login-error { color: #b3392a; font-size: 0.82rem; margin-top: 10px; }
+
+/* --- Tabs --- */
+.admin-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.admin-tabs button {
+  padding: 7px 14px; border-radius: 999px; border: 1px solid var(--color-border);
+  background: var(--color-paper); font-size: 0.82rem; cursor: pointer; font-family: var(--font-body);
+}
+.admin-tabs button.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.admin-tabs button:disabled { opacity: 0.4; cursor: default; }
+
+/* --- Contenido fijo (formulario) --- */
+.content-section { margin-bottom: 28px; }
+.content-section h2 { font-size: 0.95rem; margin: 0 0 12px; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 0.78rem; color: #8a8a84; margin-bottom: 4px; font-family: monospace; }
+.field textarea, .field input[type=text] {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 10px;
+  font-size: 0.88rem; font-family: var(--font-body); resize: vertical; min-height: 44px;
+}
+.field .save-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.field button.save {
+  padding: 6px 14px; border: none; border-radius: 8px; background: var(--color-ink);
+  color: #fff; font-size: 0.78rem; cursor: pointer;
+}
+.field button.save:disabled { opacity: 0.4; cursor: default; }
+.field .status { font-size: 0.76rem; color: #6b9b5e; }
+
+.loading-note { color: #9a9a92; font-size: 0.85rem; }
+.coming-soon { color: #9a9a92; font-size: 0.85rem; padding: 40px 0; text-align: center; }

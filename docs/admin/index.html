@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>poloniapp admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <div id="login-view" class="login-box">
+    <h1>poloniapp — admin</h1>
+    <label for="email">Email</label>
+    <input id="email" type="text" autocomplete="username">
+    <label for="password">Contraseña</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <button id="login-btn">Ingresar</button>
+    <p class="login-error" id="login-error" hidden></p>
+  </div>
+
+  <div id="admin-view" class="admin-shell" hidden>
+    <header class="admin-header">
+      <h1>poloniapp — admin</h1>
+      <div>
+        <span class="who" id="who"></span>
+        · <button class="btn-link" id="logout-btn">salir</button>
+      </div>
+    </header>
+
+    <nav class="admin-tabs">
+      <button data-tab="contenido" class="active">Contenido fijo</button>
+      <button data-tab="categorias" disabled title="Próximamente (3b)">Categorías</button>
+      <button data-tab="actividades" disabled title="Próximamente (3b)">Actividades</button>
+      <button data-tab="ubicaciones" disabled title="Próximamente (3b)">Ubicaciones</button>
+      <button data-tab="publicaciones" disabled title="Próximamente (3c)">Publicaciones</button>
+      <button data-tab="textodiario" disabled title="Próximamente (3c)">Texto diario</button>
+      <button data-tab="inscripciones" disabled title="Próximamente (3c)">Inscripciones</button>
+    </nav>
+
+    <main id="tab-content">
+      <p class="loading-note">Cargando…</p>
+    </main>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
