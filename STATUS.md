@@ -30,13 +30,14 @@ Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 
 ## Backend / panel admin / scraper — en ejecución (2026-08-30)
 Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-pensando-en-como-transient-bee.md`.
 - **✅ Fase 1 — Supabase:** proyecto `poloniapp` creado (São Paulo), schema completo + RLS corrido (`supabase/schema.sql`), admin cargado, contenido real migrado (`supabase/seed.sql`).
-- **✅ Fase 2a — Home data-driven:** `docs/index.html` dejó de ser el export bundlado de Claude Design — reescrito a mano (HTML/CSS/JS simple, sin runtime bundler) con fetch client-side a Supabase. Viendo en `/preview/` (no en la raíz todavía, ver nota de deploy abajo).
-- **Pendiente 2b:** navegación real Home → Actividades → detalle (hoy son placeholders `href="#"`).
-- **Pendiente 2c:** bubble chat → WhatsApp (falta el link real del centro).
+- **✅ Fase 2a — Home data-driven:** `docs/index.html` dejó de ser el export bundlado de Claude Design — reescrito a mano (HTML/CSS/JS simple, sin runtime bundler) con fetch client-side a Supabase.
+- **✅ Fase 2b — Navegación real:** router hash-based (Home → grilla de 7 categorías → lista por categoría → detalle de actividad). Categorías sin actividades muestran "próximamente". Detalle usa `locations_public` (solo nombre, nunca dirección) y CTA de inscripción deshabilitado (llega en Fase 4).
+- **✅ Fase 2c — Bubble chat:** flotante en todas las vistas, número general en `site_content.contact.whatsapp` (+56953719944), con override por actividad vía `activities.contact_name/contact_phone` (ej. persona a cargo de un Círculo) cuando esté cargado.
+- **Fase 2 completa**, viendo en `/preview/` (no en la raíz todavía, ver nota de deploy abajo).
 - **Pendiente Fase 3:** panel admin `docs/admin/` (SPA formularios, Supabase Auth email+password).
 - **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend).
 - **Pendiente Fase 5:** scraper opusdei.org (GitHub Actions) → habilita "Textos diarios" con contenido real.
-- **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo) mientras se completan 2b-2c. Swap a la raíz pendiente de decisión explícita.
+- **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo). Swap a la raíz pendiente de decisión explícita.
 
 ## Próximos pasos (no wording)
 - Seguir el plan de backend/admin/scraper de arriba: 2b → 2c → swap a raíz → Fase 3 → Fase 4 → Fase 5.

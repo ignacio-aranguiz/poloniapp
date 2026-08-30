@@ -16,7 +16,14 @@ Proyecto `poloniapp` creado (São Paulo), `supabase/schema.sql` corrido completo
 - Se reescribió a mano: `docs/assets/css/site.css` + `docs/assets/js/app.js` (fetch client-side a Supabase, sin build step) + `docs/index.html` limpio.
 - Rutas de assets (fotos, símbolo) resueltas vía `import.meta.url` en vez de rutas relativas fijas, para que funcionen igual sin importar la profundidad de la página que las carga (raíz o `/preview/`).
 - **Deploy sin romper producción:** el build nuevo se pusheó a `docs/preview/` (`.../poloniapp/preview/`), dejando `docs/index.html` de la raíz intacto (el bundle viejo sigue siendo lo que ve el público) hasta decidir el swap.
-- Pendiente: 2b (navegación Home→Actividades→detalle), 2c (bubble chat→WhatsApp), luego swap a raíz.
+
+### Fase 2b — Navegación real
+Router hash-based en `app.js` (`#/`, `#/actividades`, `#/actividades/:slug`, `#/actividad/:id`, `#/quienes-somos`). Grilla de categorías con estado "próximamente" para las que no tienen actividades cargadas (Confesiones). Detalle de actividad: sesiones ordenadas (por fecha, o por día de semana si son recurrentes), ubicación mostrada solo por nombre — se agregó la vista `locations_public` (expone `id, name`) porque RLS filtra por fila completa, no por columna: sin esa vista, ni siquiera el nombre público de la ubicación era legible (solo `is_admin()` podía leer `locations`). CTA "Inscribirme" deshabilitado, llega en Fase 4.
+
+### Fase 2c — Bubble chat → WhatsApp
+Número general del centro (+56953719944) cargado en `site_content.contact.whatsapp` (editable luego desde el panel admin). Se agregó `activities.contact_name` / `activities.contact_phone` (nullable) para que el bubble muestre el contacto propio de una actividad cuando exista (ej. la persona a cargo de un Círculo) en vez del número general — cae al general si están vacíos.
+
+Con esto queda cerrada la Fase 2 completa (2a+2b+2c). Pendiente: swap `docs/preview/` → raíz, luego Fase 3 (panel admin), Fase 4 (inscripciones), Fase 5 (scraper).
 
 ---
 
