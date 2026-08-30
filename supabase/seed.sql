@@ -9,7 +9,8 @@ insert into site_content (key, section, value) values
   ('hero.title', 'Hero', 'Que busques a Cristo, que encuentres a Cristo, que ames a Cristo.'),
   ('hero.subtitle', 'Hero', 'Buscar a Dios en la vida ordinaria, y darlo a conocer.'),
   ('quienes_somos.teaser', 'Quiénes somos', 'Centro cultural del Opus Dei en Las Condes. Círculos, retiros, charlas y confesiones, siempre en el trato de a uno.'),
-  ('quienes_somos.objetivo', 'Quiénes somos', 'Buscar a Dios en la vida ordinaria, y darlo a conocer.')
+  ('quienes_somos.objetivo', 'Quiénes somos', 'Buscar a Dios en la vida ordinaria, y darlo a conocer.'),
+  ('contact.whatsapp', 'Contacto', '+56953719944')
 on conflict (key) do nothing;
 
 -- =========================================================

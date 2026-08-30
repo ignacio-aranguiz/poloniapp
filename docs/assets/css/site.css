@@ -277,6 +277,24 @@ body {
 .session-row .speaker { margin: 0 0 4px; font-size: 0.8rem; color: #6b6b66; }
 .session-row .location { margin: 0; font-size: 0.78rem; color: #8a8a84; }
 .session-row .price { margin: 4px 0 0; font-size: 0.8rem; font-weight: 600; color: var(--color-primary); }
+/* --- Bubble chat (WhatsApp) --- */
+.chat-bubble {
+  position: fixed;
+  bottom: 84px;
+  right: max(16px, calc((100vw - 480px) / 2 + 16px));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  z-index: 10;
+  text-decoration: none;
+}
+.chat-bubble svg { width: 26px; height: 26px; }
+
 .cta-inscribir {
   width: 100%;
   padding: 14px;

@@ -67,6 +67,8 @@ create table if not exists activities (
   format text not null check (format in ('single', 'series')),
   photo_url text,
   visible boolean not null default true,
+  contact_name text,   -- persona de contacto de esta actividad (ej. "Joaquín"), opcional
+  contact_phone text,  -- si está vacío, el bubble de contacto cae al número general del centro
   created_at timestamptz not null default now()
 );
 
