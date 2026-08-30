@@ -86,3 +86,35 @@ body {
 
 .loading-note { color: #9a9a92; font-size: 0.85rem; }
 .coming-soon { color: #9a9a92; font-size: 0.85rem; padding: 40px 0; text-align: center; }
+
+/* --- CRUD genérico (categorías / actividades / ubicaciones) --- */
+.crud-card {
+  background: var(--color-cream); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
+}
+.crud-card.new { background: var(--color-paper); border: 1px dashed var(--color-border); }
+.crud-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.crud-row > div { flex: 1; min-width: 140px; }
+.crud-row label { display: block; font-size: 0.72rem; color: #8a8a84; margin-bottom: 3px; }
+.crud-row input[type=text], .crud-row input[type=number], .crud-row input[type=time], .crud-row input[type=date],
+.crud-row textarea, .crud-row select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px;
+  font-size: 0.85rem; font-family: var(--font-body);
+}
+.crud-row textarea { min-height: 38px; resize: vertical; }
+.crud-check { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; flex: 0 0 auto !important; align-self: flex-end; padding-bottom: 8px; }
+.crud-actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.crud-actions button {
+  padding: 6px 14px; border: none; border-radius: 8px; font-size: 0.78rem; cursor: pointer; font-family: var(--font-body);
+}
+.crud-actions .save { background: var(--color-ink); color: #fff; }
+.crud-actions .save:disabled { opacity: 0.4; cursor: default; }
+.crud-actions .delete { background: transparent; color: #b3392a; border: 1px solid #e3b6ac; }
+.crud-actions .status { font-size: 0.76rem; color: #6b9b5e; }
+
+.sessions-block { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border); }
+.sessions-block h4 { font-size: 0.8rem; margin: 0 0 8px; color: #6b6b66; }
+.session-crud-row { background: var(--color-paper); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.add-btn {
+  padding: 7px 14px; border: 1px solid var(--color-primary); background: transparent; color: var(--color-primary);
+  border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-family: var(--font-body); margin-top: 6px;
+}

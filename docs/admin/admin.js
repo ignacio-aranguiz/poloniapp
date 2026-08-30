@@ -69,6 +69,9 @@ document.querySelectorAll('.admin-tabs button').forEach((btn) => {
 
 function loadTab(tab) {
   if (tab === 'contenido') return loadContenido();
+  if (tab === 'categorias') return loadCategorias();
+  if (tab === 'ubicaciones') return loadUbicaciones();
+  if (tab === 'actividades') return loadActividades();
   document.getElementById('tab-content').innerHTML = `<p class="coming-soon">Próximamente.</p>`;
 }
 
@@ -185,6 +188,376 @@ async function loadContenido() {
       } else {
         status.textContent = 'Guardado ✓';
       }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Categorías (editar las 9 existentes — crear una nueva no es prioritario, ver DECISIONS.md)
+// ---------------------------------------------------------------------------
+async function loadCategorias() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const { data, error } = await sb.from('categories').select('*').order('sort_order');
+  if (error) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(error.message)}</p>`;
+    return;
+  }
+
+  container.innerHTML = data
+    .map(
+      (c) => `
+    <div class="crud-card" data-id="${c.id}">
+      <div class="crud-row">
+        <div><label>Nombre</label><input type="text" class="f-name" value="${esc(c.name)}"></div>
+        <div style="flex:0 0 90px;"><label>Orden</label><input type="number" class="f-sort" value="${c.sort_order}"></div>
+        <div style="flex:0 0 130px;"><label>Bucket</label>
+          <select class="f-bucket">
+            <option value="" ${!c.bucket ? 'selected' : ''}>(ninguno)</option>
+            <option value="formacion" ${c.bucket === 'formacion' ? 'selected' : ''}>formación</option>
+            <option value="laboral" ${c.bucket === 'laboral' ? 'selected' : ''}>laboral</option>
+            <option value="familia" ${c.bucket === 'familia' ? 'selected' : ''}>familia</option>
+          </select>
+        </div>
+        <div class="crud-check"><label><input type="checkbox" class="f-visible" ${c.visible ? 'checked' : ''}> visible</label></div>
+      </div>
+      <div class="crud-row">
+        <div><label>Descripción</label><textarea class="f-desc" placeholder="(sin descripción propia todavía)">${esc(c.description)}</textarea></div>
+      </div>
+      <div class="crud-actions">
+        <button class="save">Guardar</button>
+        <span class="status"></span>
+      </div>
+    </div>`
+    )
+    .join('');
+
+  container.querySelectorAll('.crud-card').forEach((card) => {
+    const id = card.dataset.id;
+    const saveBtn = card.querySelector('.save');
+    const status = card.querySelector('.status');
+    saveBtn.addEventListener('click', async () => {
+      saveBtn.disabled = true;
+      status.textContent = 'Guardando…';
+      const { error } = await sb
+        .from('categories')
+        .update({
+          name: card.querySelector('.f-name').value,
+          description: card.querySelector('.f-desc').value || null,
+          sort_order: Number(card.querySelector('.f-sort').value) || 0,
+          bucket: card.querySelector('.f-bucket').value || null,
+          visible: card.querySelector('.f-visible').checked,
+        })
+        .eq('id', id);
+      saveBtn.disabled = false;
+      status.textContent = error ? 'Error: ' + error.message : 'Guardado ✓';
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Ubicaciones (CRUD simple)
+// ---------------------------------------------------------------------------
+function locationCardHtml(l) {
+  return `
+    <div class="crud-card" data-id="${l?.id || ''}">
+      <div class="crud-row">
+        <div><label>Nombre público</label><input type="text" class="f-name" value="${esc(l?.name)}" placeholder="ej. Las Condes"></div>
+        <div><label>Dirección real (nunca pública)</label><input type="text" class="f-address" value="${esc(l?.address)}" placeholder="ej. Polonia 306, Las Condes"></div>
+      </div>
+      <div class="crud-actions">
+        <button class="save">${l ? 'Guardar' : 'Crear'}</button>
+        ${l ? `<button class="delete">Borrar</button>` : ''}
+        <span class="status"></span>
+      </div>
+    </div>`;
+}
+
+async function loadUbicaciones() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const { data, error } = await sb.from('locations').select('*').order('name');
+  if (error) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(error.message)}</p>`;
+    return;
+  }
+
+  container.innerHTML = data.map(locationCardHtml).join('') + `<h3 style="font-size:0.9rem;margin:24px 0 10px;">Nueva ubicación</h3>` + locationCardHtml(null);
+
+  wireLocationCards(container);
+}
+
+function wireLocationCards(container) {
+  container.querySelectorAll('.crud-card').forEach((card) => {
+    const id = card.dataset.id;
+    const saveBtn = card.querySelector('.save');
+    const deleteBtn = card.querySelector('.delete');
+    const status = card.querySelector('.status');
+
+    saveBtn.addEventListener('click', async () => {
+      const name = card.querySelector('.f-name').value.trim();
+      const address = card.querySelector('.f-address').value.trim();
+      if (!name || !address) {
+        status.textContent = 'Nombre y dirección son obligatorios.';
+        return;
+      }
+      saveBtn.disabled = true;
+      status.textContent = 'Guardando…';
+      const { error } = id
+        ? await sb.from('locations').update({ name, address }).eq('id', id)
+        : await sb.from('locations').insert({ name, address });
+      saveBtn.disabled = false;
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        status.textContent = 'Guardado ✓';
+        if (!id) loadUbicaciones(); // recarga para que la nueva pase a la lista y limpie el form
+      }
+    });
+
+    deleteBtn?.addEventListener('click', async () => {
+      if (!confirm('¿Borrar esta ubicación? Las sesiones que la usan quedan sin ubicación.')) return;
+      const { error } = await sb.from('locations').delete().eq('id', id);
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadUbicaciones();
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Actividades (CRUD + sesiones anidadas)
+// ---------------------------------------------------------------------------
+function sessionRowHtml(s, activityId, locOptions) {
+  return `
+    <div class="session-crud-row" data-id="${s?.id || ''}" data-activity="${activityId}">
+      <div class="crud-row">
+        <div><label>Fecha (o vacío si es recurrente)</label><input type="date" class="s-date" value="${s?.date || ''}"></div>
+        <div><label>Día recurrente (ej. Lunes)</label><input type="text" class="s-weekday" value="${esc(s?.weekday)}"></div>
+        <div style="flex:0 0 100px;"><label>Hora inicio</label><input type="time" class="s-start" value="${s?.time_start?.slice(0, 5) || ''}"></div>
+        <div style="flex:0 0 100px;"><label>Hora fin</label><input type="time" class="s-end" value="${s?.time_end?.slice(0, 5) || ''}"></div>
+      </div>
+      <div class="crud-row">
+        <div><label>Tema</label><input type="text" class="s-topic" value="${esc(s?.topic)}"></div>
+        <div><label>Expositor</label><input type="text" class="s-speaker" value="${esc(s?.speaker)}"></div>
+        <div style="flex:0 0 140px;"><label>Precio</label><input type="text" class="s-price" value="${esc(s?.price)}" placeholder="ej. $10.000"></div>
+        <div style="flex:0 0 160px;"><label>Ubicación</label><select class="s-location">${locOptions(s)}</select></div>
+      </div>
+      <div class="crud-actions">
+        <button class="save">${s ? 'Guardar sesión' : 'Agregar sesión'}</button>
+        ${s ? `<button class="delete">Borrar</button>` : ''}
+        <span class="status"></span>
+      </div>
+    </div>`;
+}
+
+async function loadActividades() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const [{ data: activities, error: e1 }, { data: categories, error: e2 }, { data: locations, error: e3 }] = await Promise.all([
+    sb.from('activities').select('*, sessions(*)').order('title'),
+    sb.from('categories').select('id,name').order('sort_order'),
+    sb.from('locations').select('id,name').order('name'),
+  ]);
+  const err = e1 || e2 || e3;
+  if (err) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(err.message)}</p>`;
+    return;
+  }
+
+  const catOptions = (selectedId) =>
+    categories.map((c) => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  const locOptions = (s) =>
+    `<option value="">(sin ubicación)</option>` +
+    locations.map((l) => `<option value="${l.id}" ${l.id === s?.location_id ? 'selected' : ''}>${esc(l.name)}</option>`).join('');
+
+  function previewSrc(photoUrl) {
+    if (!photoUrl) return '';
+    return /^https?:\/\//.test(photoUrl) ? photoUrl : '../' + photoUrl;
+  }
+
+  function activityCardHtml(a) {
+    const sessions = a ? a.sessions || [] : [];
+    return `
+      <div class="crud-card" data-id="${a?.id || ''}">
+        <div class="crud-row">
+          <div><label>Título</label><input type="text" class="f-title" value="${esc(a?.title)}"></div>
+          <div style="flex:0 0 160px;"><label>Categoría</label><select class="f-category">${catOptions(a?.category_id)}</select></div>
+          <div style="flex:0 0 110px;"><label>Formato</label>
+            <select class="f-format">
+              <option value="single" ${!a || a.format === 'single' ? 'selected' : ''}>única</option>
+              <option value="series" ${a?.format === 'series' ? 'selected' : ''}>serie</option>
+            </select>
+          </div>
+          <div class="crud-check"><label><input type="checkbox" class="f-visible" ${!a || a.visible ? 'checked' : ''}> visible</label></div>
+        </div>
+        <div class="crud-row">
+          <div><label>Descripción</label><textarea class="f-desc">${esc(a?.description)}</textarea></div>
+        </div>
+        <div class="crud-row">
+          <div>
+            <label>Foto</label>
+            <div class="image-field">
+              <img class="image-preview" src="${esc(previewSrc(a?.photo_url))}" ${a?.photo_url ? '' : 'hidden'}>
+              <input type="file" accept="image/*" class="image-input">
+              <span class="status upload-status"></span>
+            </div>
+            <input type="text" class="f-photo" value="${esc(a?.photo_url)}" placeholder="o pegá un path/URL (ej. assets/activities/foto.jpg)">
+          </div>
+        </div>
+        <div class="crud-row">
+          <div><label>Contacto — nombre (opcional, si no usa el WhatsApp general)</label><input type="text" class="f-contact-name" value="${esc(a?.contact_name)}"></div>
+          <div><label>Contacto — teléfono</label><input type="text" class="f-contact-phone" value="${esc(a?.contact_phone)}" placeholder="+569..."></div>
+        </div>
+        <div class="crud-actions">
+          <button class="save">${a ? 'Guardar' : 'Crear actividad'}</button>
+          ${a ? `<button class="delete">Borrar</button>` : ''}
+          <span class="status"></span>
+        </div>
+        ${
+          a
+            ? `<div class="sessions-block">
+                 <h4>Sesiones (${sessions.length})</h4>
+                 <div class="sessions-list">${sessions.map((s) => sessionRowHtml(s, a.id, locOptions)).join('')}</div>
+                 <button class="add-btn add-session">+ agregar sesión</button>
+               </div>`
+            : ''
+        }
+      </div>`;
+  }
+
+  container.innerHTML =
+    activities.map(activityCardHtml).join('') + `<h3 style="font-size:0.9rem;margin:24px 0 10px;">Nueva actividad</h3>` + activityCardHtml(null);
+
+  wireActivityCards(container, { locOptions });
+}
+
+function wireSessionRow(row, sb_, locOptions) {
+  const id = row.dataset.id;
+  const activityId = row.dataset.activity;
+  const saveBtn = row.querySelector('.save');
+  const deleteBtn = row.querySelector('.delete');
+  const status = row.querySelector('.status');
+
+  saveBtn.addEventListener('click', async () => {
+    const date = row.querySelector('.s-date').value || null;
+    const weekday = row.querySelector('.s-weekday').value.trim() || null;
+    if (!date && !weekday) {
+      status.textContent = 'Necesita fecha o día recurrente.';
+      return;
+    }
+    const payload = {
+      activity_id: activityId,
+      date,
+      weekday,
+      time_start: row.querySelector('.s-start').value || null,
+      time_end: row.querySelector('.s-end').value || null,
+      topic: row.querySelector('.s-topic').value.trim() || null,
+      speaker: row.querySelector('.s-speaker').value.trim() || null,
+      price: row.querySelector('.s-price').value.trim() || null,
+      location_id: row.querySelector('.s-location').value || null,
+    };
+    saveBtn.disabled = true;
+    status.textContent = 'Guardando…';
+    const { error } = id ? await sb.from('sessions').update(payload).eq('id', id) : await sb.from('sessions').insert(payload);
+    saveBtn.disabled = false;
+    if (error) {
+      status.textContent = 'Error: ' + error.message;
+    } else {
+      loadActividades();
+    }
+  });
+
+  deleteBtn?.addEventListener('click', async () => {
+    if (!confirm('¿Borrar esta sesión?')) return;
+    const { error } = await sb.from('sessions').delete().eq('id', id);
+    if (error) {
+      status.textContent = 'Error: ' + error.message;
+    } else {
+      loadActividades();
+    }
+  });
+}
+
+function wireActivityCards(container, { locOptions }) {
+  container.querySelectorAll('.crud-card').forEach((card) => {
+    const id = card.dataset.id;
+    const saveBtn = card.querySelector('.save');
+    const deleteBtn = card.querySelector('.delete');
+    const status = card.querySelector('.status');
+
+    const fileInput = card.querySelector('.image-input');
+    const photoField = card.querySelector('.f-photo');
+    if (fileInput) {
+      const preview = card.querySelector('.image-preview');
+      const uploadStatus = card.querySelector('.upload-status');
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        uploadStatus.textContent = 'Subiendo…';
+        try {
+          const url = await uploadImage(file);
+          photoField.value = url;
+          preview.src = url;
+          preview.hidden = false;
+          uploadStatus.textContent = 'Subida ✓ — falta Guardar';
+        } catch (err) {
+          uploadStatus.textContent = 'Error: ' + err.message;
+        }
+      });
+    }
+
+    saveBtn.addEventListener('click', async () => {
+      const title = card.querySelector('.f-title').value.trim();
+      if (!title) {
+        status.textContent = 'El título es obligatorio.';
+        return;
+      }
+      const payload = {
+        title,
+        category_id: card.querySelector('.f-category').value,
+        format: card.querySelector('.f-format').value,
+        visible: card.querySelector('.f-visible').checked,
+        description: card.querySelector('.f-desc').value.trim() || null,
+        photo_url: photoField.value.trim() || null,
+        contact_name: card.querySelector('.f-contact-name').value.trim() || null,
+        contact_phone: card.querySelector('.f-contact-phone').value.trim() || null,
+      };
+      saveBtn.disabled = true;
+      status.textContent = 'Guardando…';
+      const { error } = id ? await sb.from('activities').update(payload).eq('id', id) : await sb.from('activities').insert(payload);
+      saveBtn.disabled = false;
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadActividades();
+      }
+    });
+
+    deleteBtn?.addEventListener('click', async () => {
+      if (!confirm('¿Borrar esta actividad y todas sus sesiones?')) return;
+      const { error } = await sb.from('activities').delete().eq('id', id);
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadActividades();
+      }
+    });
+
+    card.querySelectorAll('.session-crud-row').forEach((row) => wireSessionRow(row, sb, locOptions));
+
+    card.querySelector('.add-session')?.addEventListener('click', () => {
+      const list = card.querySelector('.sessions-list');
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = sessionRowHtml(null, id, locOptions);
+      const row = wrapper.firstElementChild;
+      list.appendChild(row);
+      wireSessionRow(row, sb, locOptions);
     });
   });
 }
