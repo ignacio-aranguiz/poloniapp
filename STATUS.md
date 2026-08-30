@@ -21,11 +21,12 @@ Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 
 - 3 publicaciones de O. reales (título e imagen extraídos de opusdei.org por fetch directo), con link a la URL real del artículo.
 - **Navegación por categoría (2026-08-29, `NAVIGATION_BRIEF.md`, ya ejecutado):** Actividades es grilla de 7 categorías con drill-down (ya no agrupa por fecha). Home con chips progresivos, prefiltrado en "formación/espiritual" al abrir. Visitas a los pobres/Colectas ocultas (texto listo en `DECISIONS.md` para reactivar). Círculos con placeholder de símbolo; las otras 6 actividades reales ya tienen foto propia (incluye Optimal Work y Jornada Matrimonio y Familia).
 
-## Wording — qué falta todavía (auditoría 2026-08-29)
-- **"Todo te recarga"** — frase de cierre de las stories, sin lugar asignado aún.
-- **Descripciones de categoría** — ya redactadas y cerradas (ver `DECISIONS.md`, sección "Descripciones de categoría"), pero **no están cableadas en el HTML todavía** porque la grilla de categorías no existe hasta que vuelva la ronda de `NAVIGATION_BRIEF.md`. Pegarlas ahí cuando se integre.
-- **Sección "Textos diarios"** — decidida hace varias rondas (card que redirige a opusdei.org/es-cl/dailytext, mismo patrón que Publicaciones), **nunca se implementó**. Pendiente real, no solo de wording.
-- **"Qué se hace acá" en Quiénes somos** — hoy comprime 7 categorías en 4 bullets del template viejo; expandir a las 7 (o 5 visibles, ver nota de Visitas/Colectas) cuando se toque esa sección de nuevo.
+## Wording — qué falta todavía (auditoría 2026-08-29, resuelto 2026-08-30)
+- **"Todo te recarga"** — frase de cierre de las stories, sigue sin lugar asignado. Único pendiente real de esta lista.
+- ~~Descripciones de categoría sin cablear~~ — resuelto: son editables desde el admin (tab Categorías), se muestran en la página de cada categoría cuando existen.
+- ~~Sección "Textos diarios" nunca implementada~~ — resuelto (carga manual desde el admin, ver sección de abajo).
+- ~~"Qué se hace acá" con bullets fijos del template viejo~~ — resuelto: ahora se genera en vivo listando `categories.name`, nunca queda desincronizado de la grilla real.
+- ~~Confesiones sin contenido~~ — resuelto: tarjeta "Reservar hora de confesión" que redirige a `poloniasub35.setmore.com` (booking real del centro), editable vía `site_content.confesiones.booking_url`.
 
 ## Backend / panel admin / scraper — en ejecución (2026-08-30)
 Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-pensando-en-como-transient-bee.md`.

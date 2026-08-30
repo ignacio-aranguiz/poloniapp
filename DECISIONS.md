@@ -40,6 +40,9 @@ Al construir el scraper (Node + fetch nativo + GitHub Actions cron, según lo pl
 
 Se quita también el badge "sync diario" de Publicaciones en la Home, porque ya no describe la realidad (nunca fue automático, y ahora es explícito que no lo es).
 
+### Confesiones — deuda cerrada: tarjeta de reserva externa (Setmore)
+El centro ya tiene un sistema de reservas real para confesiones: `poloniasub35.setmore.com` (Don Blas Lozano, Don José Antonio Cordero, slots de 10-30 min, dirección Polonia 306). Se agregó `site_content.confesiones.booking_url` con esa URL, y la página de la categoría Confesiones muestra una tarjeta "Reservar hora de confesión" con CTA que abre el booking afuera — mismo patrón externo que Publicaciones/Texto diario, sin flujo de reserva propio (no tiene sentido duplicar un sistema de booking que ya funciona). La grilla de Actividades también muestra "reservar hora" en vez de "próximamente" para esta categoría.
+
 ---
 
 ## 2026-08-30 — Ronda 7: plan de backend, panel admin y jobs de contenido
