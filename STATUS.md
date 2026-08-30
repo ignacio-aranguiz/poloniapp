@@ -1,5 +1,16 @@
 # STATUS — poloniapp
 
+## Links rápidos
+| Link | Para qué sirve |
+|---|---|
+| https://ignacio-aranguiz.github.io/poloniapp/ | Sitio en producción — lo que ve el público hoy (bundle viejo, sin tocar) |
+| https://ignacio-aranguiz.github.io/poloniapp/preview/ | Build nuevo data-driven — para validar antes del swap a la raíz |
+| https://ignacio-aranguiz.github.io/poloniapp/admin/ | Panel admin — login con email + password de Supabase Auth |
+| https://ignacio-aranguiz.github.io/poloniapp/manual/ | Guía paso a paso para los admins (con capturas reales) |
+| https://github.com/ignacio-aranguiz/poloniapp | Repo del código |
+| https://supabase.com/dashboard/project/xxnepqgoirkvikngqnii | Proyecto Supabase — SQL Editor, Table Editor, Auth, Storage |
+| https://poloniasub35.setmore.com | Sistema de reservas de confesiones (externo al proyecto, solo enlazado) |
+
 **Fase:** iteración-v1 → backend/data-driven (2026-08-30): Fases 1, 2 (a+b+c), 3 y 5 completas y viendo en `/preview/` + `/admin/`; pendiente Fase 4 (inscripciones, bloqueada por feedback de otros admins) y el swap a la raíz
 **Madurez:** 3/5
 
