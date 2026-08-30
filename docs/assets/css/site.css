@@ -277,6 +277,19 @@ body {
 .session-row .speaker { margin: 0 0 4px; font-size: 0.8rem; color: #6b6b66; }
 .session-row .location { margin: 0; font-size: 0.78rem; color: #8a8a84; }
 .session-row .price { margin: 4px 0 0; font-size: 0.8rem; font-weight: 600; color: var(--color-primary); }
+/* --- Texto diario --- */
+.daily-text-card {
+  display: block;
+  margin: 0 20px 8px;
+  padding: 16px 18px;
+  background: var(--color-cream);
+  border-radius: var(--radius-card);
+  text-decoration: none;
+  color: var(--color-ink);
+}
+.daily-text-card .title { font-family: var(--font-heading); font-size: 0.95rem; margin: 0 0 8px; }
+.daily-text-card .excerpt { font-size: 0.85rem; color: #4d4d48; line-height: 1.4; margin: 0 0 10px; }
+
 /* --- Quiénes somos (vista completa) --- */
 .about-p { margin: 0; font-size: 0.9rem; color: #4d4d48; line-height: 1.5; }
 .about-photo {

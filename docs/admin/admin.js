@@ -676,8 +676,30 @@ async function loadPublicaciones() {
 }
 
 // ---------------------------------------------------------------------------
-// Tab: Texto diario (solo lectura — lo llena el scraper de la Fase 5)
+// Tab: Texto diario (carga manual — opusdei.org bloquea scraping con Cloudflare,
+// ver DECISIONS.md. Mismo patrón que Publicaciones: alguien pega el texto del día a mano.)
 // ---------------------------------------------------------------------------
+function dailyTextCardHtml(d) {
+  return `
+    <div class="crud-card" data-id="${d?.id || ''}">
+      <div class="crud-row">
+        <div style="flex:0 0 150px;"><label>Fecha</label><input type="date" class="f-date" value="${d?.date || ''}"></div>
+        <div><label>Título</label><input type="text" class="f-title" value="${esc(d?.title)}"></div>
+      </div>
+      <div class="crud-row">
+        <div><label>Excerpt</label><textarea class="f-excerpt">${esc(d?.excerpt)}</textarea></div>
+      </div>
+      <div class="crud-row">
+        <div><label>URL en opusdei.org</label><input type="text" class="f-url" value="${esc(d?.external_url)}" placeholder="https://opusdei.org/es-cl/dailytext/..."></div>
+      </div>
+      <div class="crud-actions">
+        <button class="save">${d ? 'Guardar' : 'Cargar texto del día'}</button>
+        ${d ? `<button class="delete">Borrar</button>` : ''}
+        <span class="status"></span>
+      </div>
+    </div>`;
+}
+
 async function loadTextoDiario() {
   const container = document.getElementById('tab-content');
   container.innerHTML = `<p class="loading-note">Cargando…</p>`;
@@ -688,26 +710,51 @@ async function loadTextoDiario() {
     return;
   }
 
-  if (!data.length) {
-    container.innerHTML = `<p class="loading-note">Todavía no hay texto diario cargado — lo va a llenar el scraper automático (Fase 5, pendiente de construir).</p>`;
-    return;
-  }
+  container.innerHTML =
+    `<p class="loading-note" style="margin-bottom:16px;">opusdei.org bloquea el scraping automático (Cloudflare) — el texto del día se carga a mano acá, tarda 1 minuto: copiás título, extracto y link desde <a href="https://opusdei.org/es-cl/dailytext" target="_blank" rel="noopener">opusdei.org/es-cl/dailytext</a>.</p>` +
+    data.map(dailyTextCardHtml).join('') +
+    `<h3 style="font-size:0.9rem;margin:24px 0 10px;">Cargar texto de hoy</h3>` +
+    dailyTextCardHtml(null);
 
-  container.innerHTML = `
-    <table class="data-table">
-      <tr><th>Fecha</th><th>Título</th><th>Excerpt</th><th>Link</th></tr>
-      ${data
-        .map(
-          (d) => `
-        <tr>
-          <td>${esc(d.date)}</td>
-          <td>${esc(d.title)}</td>
-          <td>${esc(d.excerpt)}</td>
-          <td><a href="${esc(d.external_url)}" target="_blank" rel="noopener">ver</a></td>
-        </tr>`
-        )
-        .join('')}
-    </table>`;
+  container.querySelectorAll('.crud-card').forEach((card) => {
+    const id = card.dataset.id;
+    const saveBtn = card.querySelector('.save');
+    const deleteBtn = card.querySelector('.delete');
+    const status = card.querySelector('.status');
+
+    saveBtn.addEventListener('click', async () => {
+      const date = card.querySelector('.f-date').value;
+      const title = card.querySelector('.f-title').value.trim();
+      const excerpt = card.querySelector('.f-excerpt').value.trim();
+      const externalUrl = card.querySelector('.f-url').value.trim();
+      if (!date || !title || !excerpt || !externalUrl) {
+        status.textContent = 'Todos los campos son obligatorios.';
+        return;
+      }
+      saveBtn.disabled = true;
+      status.textContent = 'Guardando…';
+      const payload = { date, title, excerpt, external_url: externalUrl, scraped_at: new Date().toISOString() };
+      const { error } = id
+        ? await sb.from('daily_texts').update(payload).eq('id', id)
+        : await sb.from('daily_texts').insert(payload);
+      saveBtn.disabled = false;
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadTextoDiario();
+      }
+    });
+
+    deleteBtn?.addEventListener('click', async () => {
+      if (!confirm('¿Borrar este texto diario?')) return;
+      const { error } = await sb.from('daily_texts').delete().eq('id', id);
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadTextoDiario();
+      }
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------

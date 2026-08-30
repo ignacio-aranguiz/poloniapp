@@ -54,17 +54,23 @@ function nextSession(activity) {
 // ---------------------------------------------------------------------------
 // Estado global (fetch una sola vez, se reusa entre vistas)
 // ---------------------------------------------------------------------------
-const state = { content: {}, categories: [], categoriesById: {}, activities: [], posts: [] };
+const state = { content: {}, categories: [], categoriesById: {}, activities: [], posts: [], dailyText: null };
 
 async function loadData() {
-  const [{ data: content, error: e1 }, { data: categories, error: e2 }, { data: activities, error: e3 }, { data: posts, error: e4 }] =
-    await Promise.all([
-      sb.from('site_content').select('key,value'),
-      sb.from('categories').select('*').eq('visible', true).order('sort_order'),
-      sb.from('activities').select('*, sessions(*)').eq('visible', true),
-      sb.from('posts').select('*').eq('visible', true).order('published_at', { ascending: false }).limit(3),
-    ]);
-  const err = e1 || e2 || e3 || e4;
+  const [
+    { data: content, error: e1 },
+    { data: categories, error: e2 },
+    { data: activities, error: e3 },
+    { data: posts, error: e4 },
+    { data: dailyTexts, error: e5 },
+  ] = await Promise.all([
+    sb.from('site_content').select('key,value'),
+    sb.from('categories').select('*').eq('visible', true).order('sort_order'),
+    sb.from('activities').select('*, sessions(*)').eq('visible', true),
+    sb.from('posts').select('*').eq('visible', true).order('published_at', { ascending: false }).limit(3),
+    sb.from('daily_texts').select('*').order('date', { ascending: false }).limit(1),
+  ]);
+  const err = e1 || e2 || e3 || e4 || e5;
   if (err) throw err;
 
   state.content = Object.fromEntries((content || []).map((c) => [c.key, c.value]));
@@ -72,6 +78,7 @@ async function loadData() {
   state.categoriesById = Object.fromEntries(state.categories.map((c) => [c.id, c]));
   state.activities = activities || [];
   state.posts = posts || [];
+  state.dailyText = (dailyTexts && dailyTexts[0]) || null;
 }
 
 // ---------------------------------------------------------------------------
@@ -147,7 +154,17 @@ function renderHome() {
     <section class="section"><h2 class="section-title">Actividades</h2></section>
     <div class="activities-grid" id="activities-grid"></div>
     <a class="see-all" href="#/actividades">ver todas →</a>
-    <section class="section"><h2 class="section-title">Publicaciones de O. <span class="badge-sync">sync diario</span></h2></section>
+    ${
+      state.dailyText
+        ? `<section class="section"><h2 class="section-title">Texto diario</h2></section>
+    <a class="daily-text-card" href="${esc(state.dailyText.external_url)}" target="_blank" rel="noopener">
+      <p class="title">${esc(state.dailyText.title)}</p>
+      <p class="excerpt">${esc(state.dailyText.excerpt)}</p>
+      <span class="see-all" style="padding:0;">leer completo →</span>
+    </a>`
+        : ''
+    }
+    <section class="section"><h2 class="section-title">Publicaciones de O.</h2></section>
     <div class="posts-list">${state.posts.map(postCard).join('')}</div>
     <div class="about-teaser">
       <h2>Quiénes somos</h2>
