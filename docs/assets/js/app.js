@@ -239,10 +239,16 @@ function renderCategorias() {
         .filter((c) => c.slug !== 'publicaciones')
         .map((c) => {
           const count = state.activities.filter((a) => a.category_id === c.id).length;
+          const countLabel =
+            c.slug === 'confesiones' && state.content['confesiones.booking_url']
+              ? 'reservar hora'
+              : count > 0
+              ? `${count} actividad${count > 1 ? 'es' : ''}`
+              : 'próximamente';
           return `
             <a class="category-card" href="#/actividades/${c.slug}">
               <p class="cat-name">${esc(c.name)}</p>
-              <p class="cat-count">${count > 0 ? `${count} actividad${count > 1 ? 'es' : ''}` : 'próximamente'}</p>
+              <p class="cat-count">${countLabel}</p>
             </a>`;
         })
         .join('')}
@@ -270,6 +276,8 @@ function renderCategoria(slug) {
       return String(da).localeCompare(String(db));
     });
 
+  const bookingUrl = category.slug === 'confesiones' ? state.content['confesiones.booking_url'] : null;
+
   view.innerHTML = `
     <section class="hero" style="padding-bottom:8px;">
       <a href="#/actividades" style="font-size:0.8rem;color:var(--color-primary);text-decoration:none;">← volver</a>
@@ -277,7 +285,13 @@ function renderCategoria(slug) {
       ${category.description ? `<p>${esc(category.description)}</p>` : ''}
     </section>
     ${
-      list.length === 0
+      bookingUrl
+        ? `<a class="booking-card" href="${esc(bookingUrl)}" target="_blank" rel="noopener">
+             <p class="title">Reservar hora de confesión</p>
+             <p class="sub">Elegís día y horario disponible, en pocos minutos.</p>
+             <span class="cta">Reservar →</span>
+           </a>`
+        : list.length === 0
         ? `<p class="loading-note">Todavía no hay actividades cargadas en esta categoría — próximamente.</p>`
         : `<div class="activities-list">${list.map(activityListRow).join('')}</div>`
     }`;
