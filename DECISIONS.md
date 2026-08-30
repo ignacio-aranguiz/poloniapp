@@ -23,7 +23,15 @@ Router hash-based en `app.js` (`#/`, `#/actividades`, `#/actividades/:slug`, `#/
 ### Fase 2c — Bubble chat → WhatsApp
 Número general del centro (+56953719944) cargado en `site_content.contact.whatsapp` (editable luego desde el panel admin). Se agregó `activities.contact_name` / `activities.contact_phone` (nullable) para que el bubble muestre el contacto propio de una actividad cuando exista (ej. la persona a cargo de un Círculo) en vez del número general — cae al general si están vacíos.
 
-Con esto queda cerrada la Fase 2 completa (2a+2b+2c). Pendiente: swap `docs/preview/` → raíz, luego Fase 3 (panel admin), Fase 4 (inscripciones), Fase 5 (scraper).
+Con esto queda cerrada la Fase 2 completa (2a+2b+2c). Pendiente: swap `docs/preview/` → raíz, luego Fase 4 (inscripciones), Fase 5 (scraper).
+
+### Fase 3 — Panel admin completo (3a+3b+3c) + upload de imágenes + manual
+`docs/admin/`: login (Supabase Auth) verificado contra la allowlist `admins`, más las 7 pestañas planeadas — Contenido fijo, Categorías, Actividades (con sesiones anidadas: fecha o día recurrente, horario, tema/expositor, precio, ubicación), Ubicaciones, Publicaciones, Texto diario y Inscripciones (estas 2 últimas de solo lectura, se llenan solas cuando existan el scraper y el flujo de inscripción).
+- **Upload real de imágenes:** se adelantó desde el plan original (que dejaba las fotos como campo de texto/URL) — bucket público `site-images` en Supabase Storage, RLS de escritura solo-admin, reutilizado en los 3 campos de foto del panel (`quienes_somos.imagen`, actividades, publicaciones). El campo sigue aceptando pegar una URL a mano como alternativa.
+- **Manual para admins** (`docs/manual/`): guía de 6 pasos con capturas reales del panel y del sitio, mismo patrón de endpoint independiente que `/admin/` y `/preview/`.
+- **Bitácora de construcción:** resumen visual de arquitectura/UX/capabilities publicado como artifact privado (no vive en el repo).
+
+Con esto el panel admin queda completo para todo lo que ya existe en el sitio — solo faltan Fase 4 (inscripciones) y Fase 5 (scraper), que van a agregar contenido nuevo a tablas que el admin ya sabe leer/escribir donde corresponde.
 
 ---
 

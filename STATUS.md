@@ -34,7 +34,8 @@ Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-p
 - **✅ Fase 2b — Navegación real:** router hash-based (Home → grilla de 7 categorías → lista por categoría → detalle de actividad). Categorías sin actividades muestran "próximamente". Detalle usa `locations_public` (solo nombre, nunca dirección) y CTA de inscripción deshabilitado (llega en Fase 4).
 - **✅ Fase 2c — Bubble chat:** flotante en todas las vistas, número general en `site_content.contact.whatsapp` (+56953719944), con override por actividad vía `activities.contact_name/contact_phone` (ej. persona a cargo de un Círculo) cuando esté cargado.
 - **Fase 2 completa**, viendo en `/preview/` (no en la raíz todavía, ver nota de deploy abajo).
-- **Pendiente Fase 3:** panel admin `docs/admin/` (SPA formularios, Supabase Auth email+password).
+- **✅ Fase 3 — Panel admin completo:** `docs/admin/`, Supabase Auth (email+password) + allowlist `admins`. 7 pestañas: Contenido fijo, Categorías, Actividades (con sesiones anidadas), Ubicaciones, Publicaciones, Texto diario (solo lectura), Inscripciones (solo lectura). Upload real de imágenes a Supabase Storage (bucket `site-images`) en los 3 campos de foto (Quiénes somos, actividades, publicaciones).
+- **Manual para admins:** `docs/manual/` (endpoint público, con capturas reales), explica cómo entrar, editar texto, subir imagen, ver el resultado.
 - **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend).
 - **Pendiente Fase 5:** scraper opusdei.org (GitHub Actions) → habilita "Textos diarios" con contenido real.
 - **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo). Swap a la raíz pendiente de decisión explícita.
