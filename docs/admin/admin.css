@@ -79,5 +79,10 @@ body {
 .field button.save:disabled { opacity: 0.4; cursor: default; }
 .field .status { font-size: 0.76rem; color: #6b9b5e; }
 
+.image-field { margin-bottom: 8px; }
+.image-preview { display: block; max-width: 220px; max-height: 140px; border-radius: 10px; margin-bottom: 8px; object-fit: cover; }
+.image-input { font-size: 0.8rem; }
+.upload-status { display: block; margin-top: 4px; font-size: 0.76rem; color: #6b9b5e; }
+
 .loading-note { color: #9a9a92; font-size: 0.85rem; }
 .coming-soon { color: #9a9a92; font-size: 0.85rem; padding: 40px 0; text-align: center; }

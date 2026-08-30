@@ -73,6 +73,19 @@ function loadTab(tab) {
 }
 
 // ---------------------------------------------------------------------------
+// Storage — upload de imágenes (bucket público "site-images", solo admins escriben)
+// Reutilizable desde cualquier tab (contenido fijo, actividades, publicaciones).
+// ---------------------------------------------------------------------------
+async function uploadImage(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await sb.storage.from('site-images').upload(path, file, { cacheControl: '3600' });
+  if (error) throw error;
+  const { data } = sb.storage.from('site-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ---------------------------------------------------------------------------
 // Tab: Contenido fijo
 // ---------------------------------------------------------------------------
 async function loadContenido() {
@@ -96,17 +109,27 @@ async function loadContenido() {
       <section class="content-section">
         <h2>${esc(section)}</h2>
         ${rows
-          .map(
-            (r) => `
+          .map((r) => {
+            const isImage = r.key.endsWith('.imagen');
+            return `
           <div class="field" data-key="${esc(r.key)}">
             <label>${esc(r.key)}</label>
-            <textarea>${esc(r.value)}</textarea>
+            ${
+              isImage
+                ? `<div class="image-field">
+                     <img class="image-preview" src="${esc(r.value)}" ${r.value ? '' : 'hidden'}>
+                     <input type="file" accept="image/*" class="image-input">
+                     <span class="status upload-status"></span>
+                   </div>`
+                : ''
+            }
+            <textarea${isImage ? ' placeholder="o pegá una URL acá"' : ''}>${esc(r.value)}</textarea>
             <div class="save-row">
               <button class="save">Guardar</button>
               <span class="status"></span>
             </div>
-          </div>`
-          )
+          </div>`;
+          })
           .join('')}
       </section>`
     )
@@ -116,7 +139,7 @@ async function loadContenido() {
     const key = field.dataset.key;
     const textarea = field.querySelector('textarea');
     const saveBtn = field.querySelector('.save');
-    const status = field.querySelector('.status');
+    const status = field.querySelector('.save-row .status');
     const original = textarea.value;
 
     textarea.addEventListener('input', () => {
@@ -124,6 +147,27 @@ async function loadContenido() {
       saveBtn.disabled = textarea.value === original;
     });
     saveBtn.disabled = true;
+
+    const fileInput = field.querySelector('.image-input');
+    if (fileInput) {
+      const preview = field.querySelector('.image-preview');
+      const uploadStatus = field.querySelector('.upload-status');
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        uploadStatus.textContent = 'Subiendo…';
+        try {
+          const url = await uploadImage(file);
+          textarea.value = url;
+          preview.src = url;
+          preview.hidden = false;
+          uploadStatus.textContent = 'Subida ✓ — falta Guardar';
+          saveBtn.disabled = false;
+        } catch (err) {
+          uploadStatus.textContent = 'Error: ' + err.message;
+        }
+      });
+    }
 
     saveBtn.addEventListener('click', async () => {
       saveBtn.disabled = true;
