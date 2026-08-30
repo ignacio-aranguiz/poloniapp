@@ -72,6 +72,9 @@ function loadTab(tab) {
   if (tab === 'categorias') return loadCategorias();
   if (tab === 'ubicaciones') return loadUbicaciones();
   if (tab === 'actividades') return loadActividades();
+  if (tab === 'publicaciones') return loadPublicaciones();
+  if (tab === 'textodiario') return loadTextoDiario();
+  if (tab === 'inscripciones') return loadInscripciones();
   document.getElementById('tab-content').innerHTML = `<p class="coming-soon">Próximamente.</p>`;
 }
 
@@ -560,4 +563,191 @@ function wireActivityCards(container, { locOptions }) {
       wireSessionRow(row, sb, locOptions);
     });
   });
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Publicaciones (CRUD — el scraper de la Fase 5 también va a escribir acá)
+// ---------------------------------------------------------------------------
+function postCardHtml(p) {
+  return `
+    <div class="crud-card" data-id="${p?.id || ''}">
+      <div class="crud-row">
+        <div><label>Título</label><input type="text" class="f-title" value="${esc(p?.title)}"></div>
+        <div style="flex:0 0 150px;"><label>Publicado</label><input type="date" class="f-published" value="${p?.published_at || ''}"></div>
+        <div class="crud-check"><label><input type="checkbox" class="f-visible" ${!p || p.visible ? 'checked' : ''}> visible</label></div>
+      </div>
+      <div class="crud-row">
+        <div><label>URL externa (opusdei.org)</label><input type="text" class="f-url" value="${esc(p?.external_url)}" placeholder="https://opusdei.org/..."></div>
+      </div>
+      <div class="crud-row">
+        <div>
+          <label>Foto</label>
+          <div class="image-field">
+            <img class="image-preview" src="${esc(p?.image_url && /^https?:\/\//.test(p.image_url) ? p.image_url : p?.image_url ? '../' + p.image_url : '')}" ${p?.image_url ? '' : 'hidden'}>
+            <input type="file" accept="image/*" class="image-input">
+            <span class="status upload-status"></span>
+          </div>
+          <input type="text" class="f-image" value="${esc(p?.image_url)}" placeholder="o pegá un path/URL">
+        </div>
+      </div>
+      <div class="crud-actions">
+        <button class="save">${p ? 'Guardar' : 'Crear publicación'}</button>
+        ${p ? `<button class="delete">Borrar</button>` : ''}
+        <span class="status"></span>
+      </div>
+    </div>`;
+}
+
+async function loadPublicaciones() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const { data, error } = await sb.from('posts').select('*').order('published_at', { ascending: false });
+  if (error) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(error.message)}</p>`;
+    return;
+  }
+
+  container.innerHTML =
+    data.map(postCardHtml).join('') + `<h3 style="font-size:0.9rem;margin:24px 0 10px;">Nueva publicación</h3>` + postCardHtml(null);
+
+  container.querySelectorAll('.crud-card').forEach((card) => {
+    const id = card.dataset.id;
+    const saveBtn = card.querySelector('.save');
+    const deleteBtn = card.querySelector('.delete');
+    const status = card.querySelector('.status');
+    const imageField = card.querySelector('.f-image');
+
+    const fileInput = card.querySelector('.image-input');
+    if (fileInput) {
+      const preview = card.querySelector('.image-preview');
+      const uploadStatus = card.querySelector('.upload-status');
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        uploadStatus.textContent = 'Subiendo…';
+        try {
+          const url = await uploadImage(file);
+          imageField.value = url;
+          preview.src = url;
+          preview.hidden = false;
+          uploadStatus.textContent = 'Subida ✓ — falta Guardar';
+        } catch (err) {
+          uploadStatus.textContent = 'Error: ' + err.message;
+        }
+      });
+    }
+
+    saveBtn.addEventListener('click', async () => {
+      const title = card.querySelector('.f-title').value.trim();
+      const externalUrl = card.querySelector('.f-url').value.trim();
+      if (!title || !externalUrl) {
+        status.textContent = 'Título y URL externa son obligatorios.';
+        return;
+      }
+      const payload = {
+        title,
+        external_url: externalUrl,
+        published_at: card.querySelector('.f-published').value || null,
+        image_url: imageField.value.trim() || null,
+        visible: card.querySelector('.f-visible').checked,
+      };
+      saveBtn.disabled = true;
+      status.textContent = 'Guardando…';
+      const { error } = id ? await sb.from('posts').update(payload).eq('id', id) : await sb.from('posts').insert(payload);
+      saveBtn.disabled = false;
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadPublicaciones();
+      }
+    });
+
+    deleteBtn?.addEventListener('click', async () => {
+      if (!confirm('¿Borrar esta publicación?')) return;
+      const { error } = await sb.from('posts').delete().eq('id', id);
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        loadPublicaciones();
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Texto diario (solo lectura — lo llena el scraper de la Fase 5)
+// ---------------------------------------------------------------------------
+async function loadTextoDiario() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const { data, error } = await sb.from('daily_texts').select('*').order('date', { ascending: false });
+  if (error) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(error.message)}</p>`;
+    return;
+  }
+
+  if (!data.length) {
+    container.innerHTML = `<p class="loading-note">Todavía no hay texto diario cargado — lo va a llenar el scraper automático (Fase 5, pendiente de construir).</p>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="data-table">
+      <tr><th>Fecha</th><th>Título</th><th>Excerpt</th><th>Link</th></tr>
+      ${data
+        .map(
+          (d) => `
+        <tr>
+          <td>${esc(d.date)}</td>
+          <td>${esc(d.title)}</td>
+          <td>${esc(d.excerpt)}</td>
+          <td><a href="${esc(d.external_url)}" target="_blank" rel="noopener">ver</a></td>
+        </tr>`
+        )
+        .join('')}
+    </table>`;
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Inscripciones (solo lectura — quién se anotó a qué sesión)
+// ---------------------------------------------------------------------------
+async function loadInscripciones() {
+  const container = document.getElementById('tab-content');
+  container.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const { data, error } = await sb
+    .from('registrations')
+    .select('*, sessions(date, weekday, time_start, activities(title))')
+    .order('created_at', { ascending: false });
+  if (error) {
+    container.innerHTML = `<p class="loading-note">Error: ${esc(error.message)}</p>`;
+    return;
+  }
+
+  if (!data.length) {
+    container.innerHTML = `<p class="loading-note">Todavía no hay inscripciones — van a aparecer acá cuando alguien se inscriba desde el sitio (Fase 4, pendiente de construir).</p>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="data-table">
+      <tr><th>Fecha</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Actividad</th><th>Sesión</th></tr>
+      ${data
+        .map((r) => {
+          const s = r.sessions;
+          const when = s ? s.date || s.weekday || '' : '';
+          return `
+        <tr>
+          <td>${esc(new Date(r.created_at).toLocaleDateString('es-CL'))}</td>
+          <td>${esc(r.name)}</td>
+          <td>${esc(r.email)}</td>
+          <td>${esc(r.phone)}</td>
+          <td>${esc(s?.activities?.title)}</td>
+          <td>${esc(when)}</td>
+        </tr>`;
+        })
+        .join('')}
+    </table>`;
 }
