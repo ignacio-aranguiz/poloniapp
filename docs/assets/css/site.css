@@ -213,3 +213,78 @@ body {
 .tabbar a.active { color: var(--color-primary); font-weight: 600; }
 
 .loading-note { padding: 20px; color: #9a9a92; font-size: 0.85rem; }
+
+/* --- Grilla de categorías (Actividades) --- */
+.categories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 8px 20px 20px;
+}
+.category-card {
+  background: var(--color-cream);
+  border-radius: var(--radius-card);
+  padding: 18px 14px;
+  text-decoration: none;
+  color: var(--color-ink);
+  display: block;
+}
+.category-card .cat-name { font-family: var(--font-heading); font-size: 0.95rem; margin: 0 0 6px; }
+.category-card .cat-count { font-size: 0.75rem; color: #8a8a84; margin: 0; }
+
+/* --- Lista de actividades por categoría --- */
+.activities-list { padding: 4px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+.activity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+.activity-row .thumb {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-tag-bg);
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+}
+.activity-row .thumb.placeholder img { width: 55%; }
+.activity-row .title { margin: 0 0 2px; font-size: 0.9rem; font-weight: 600; }
+.activity-row .when { margin: 0; font-size: 0.78rem; color: #8a8a84; }
+
+/* --- Detalle de actividad --- */
+.detail-photo {
+  margin: 0 20px;
+  border-radius: var(--radius-card);
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-tag-bg);
+}
+.detail-photo.placeholder { display: flex; align-items: center; justify-content: center; }
+.detail-photo.placeholder img { width: 30%; }
+.sessions-list { padding: 4px 20px 4px; display: flex; flex-direction: column; gap: 10px; }
+.session-row {
+  background: var(--color-cream);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.session-row .when { font-weight: 700; margin: 0 0 4px; font-size: 0.88rem; }
+.session-row .topic { margin: 0 0 2px; font-size: 0.85rem; }
+.session-row .speaker { margin: 0 0 4px; font-size: 0.8rem; color: #6b6b66; }
+.session-row .location { margin: 0; font-size: 0.78rem; color: #8a8a84; }
+.session-row .price { margin: 4px 0 0; font-size: 0.8rem; font-weight: 600; color: var(--color-primary); }
+.cta-inscribir {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: #ddd3bf;
+  color: #8a8a84;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+}

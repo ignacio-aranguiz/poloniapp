@@ -1,7 +1,7 @@
 // poloniapp — app.js
-// Fetch client-side a Supabase (anon key, RLS pública) + render de la Home.
-// Fase 2a del plan: solo Home (header, hero, chips, grilla de actividades, posts, teaser "quiénes somos").
-// La navegación real a Actividades / detalle / Quiénes somos llega en 2b-2c.
+// Fetch client-side a Supabase (anon key, RLS pública) + render de toda la SPA.
+// Fase 2b: navegación real Home → Actividades (grilla de categorías) → categoría → detalle.
+// Fase 2c (pendiente): bubble chat → WhatsApp.
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
@@ -21,74 +21,142 @@ const BUCKET_LABELS = {
   familia: 'familia',
 };
 
+const WEEKDAY_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function fmtWhen(session) {
   if (!session) return '';
-  if (session.weekday) {
-    return `${session.weekday}${session.time_start ? ' · ' + session.time_start.slice(0, 5) : ''}`;
-  }
   if (session.date) {
     const d = new Date(session.date + 'T00:00:00');
     const label = d.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
     return `${label}${session.time_start ? ' · ' + session.time_start.slice(0, 5) : ''}`;
   }
+  if (session.weekday) {
+    return `${session.weekday}${session.time_start ? ' · ' + session.time_start.slice(0, 5) : ''}`;
+  }
   return '';
 }
 
-function activityCard(a, category) {
-  const session = a.sessions && a.sessions[0];
-  const when = fmtWhen(session);
+function nextSession(activity) {
+  const sessions = activity.sessions || [];
+  if (sessions.length === 0) return null;
+  const dated = sessions.filter((s) => s.date).sort((a, b) => a.date.localeCompare(b.date));
+  if (dated.length) return dated[0];
+  const recurring = [...sessions].sort(
+    (a, b) => WEEKDAY_ORDER.indexOf(a.weekday) - WEEKDAY_ORDER.indexOf(b.weekday)
+  );
+  return recurring[0];
+}
+
+// ---------------------------------------------------------------------------
+// Estado global (fetch una sola vez, se reusa entre vistas)
+// ---------------------------------------------------------------------------
+const state = { content: {}, categories: [], categoriesById: {}, activities: [], posts: [] };
+
+async function loadData() {
+  const [{ data: content, error: e1 }, { data: categories, error: e2 }, { data: activities, error: e3 }, { data: posts, error: e4 }] =
+    await Promise.all([
+      sb.from('site_content').select('key,value'),
+      sb.from('categories').select('*').eq('visible', true).order('sort_order'),
+      sb.from('activities').select('*, sessions(*)').eq('visible', true),
+      sb.from('posts').select('*').eq('visible', true).order('published_at', { ascending: false }).limit(3),
+    ]);
+  const err = e1 || e2 || e3 || e4;
+  if (err) throw err;
+
+  state.content = Object.fromEntries((content || []).map((c) => [c.key, c.value]));
+  state.categories = categories || [];
+  state.categoriesById = Object.fromEntries(state.categories.map((c) => [c.id, c]));
+  state.activities = activities || [];
+  state.posts = posts || [];
+}
+
+// ---------------------------------------------------------------------------
+// Componentes de tarjeta reutilizables
+// ---------------------------------------------------------------------------
+function activityCard(a) {
+  const category = state.categoriesById[a.category_id];
+  const when = fmtWhen(nextSession(a));
   const bucketLabel = category ? category.bucket : '';
+  const href = `#/actividad/${a.id}`;
   if (a.photo_url) {
     return `
-      <a class="activity-card" style="background-image:url('${assetUrl(a.photo_url)}')" href="#">
+      <a class="activity-card" style="background-image:url('${assetUrl(a.photo_url)}')" href="${href}">
         <div class="scrim"></div>
-        <span class="tag">${bucketLabel}</span>
+        <span class="tag">${esc(bucketLabel)}</span>
         <div class="info">
-          <p class="title">${a.title}</p>
-          <p class="when">${when}</p>
+          <p class="title">${esc(a.title)}</p>
+          <p class="when">${esc(when)}</p>
         </div>
       </a>`;
   }
   return `
-    <a class="activity-card placeholder" href="#">
-      <span class="tag">${bucketLabel}</span>
+    <a class="activity-card placeholder" href="${href}">
+      <span class="tag">${esc(bucketLabel)}</span>
       <img src="${assetUrl('assets/poloniapp-symbol.svg')}" alt="">
       <div class="info">
-        <p class="title">${a.title}</p>
-        <p class="when">${when}</p>
+        <p class="title">${esc(a.title)}</p>
+        <p class="when">${esc(when)}</p>
       </div>
     </a>`;
 }
 
 function postCard(p) {
   return `
-    <a class="post-card" href="${p.external_url}" target="_blank" rel="noopener">
+    <a class="post-card" href="${esc(p.external_url)}" target="_blank" rel="noopener">
       <div class="thumb" style="${p.image_url ? `background-image:url('${assetUrl(p.image_url)}')` : ''}"></div>
-      <p class="title">${p.title}</p>
+      <p class="title">${esc(p.title)}</p>
     </a>`;
 }
 
-async function loadHome() {
-  const [{ data: content }, { data: categories }, { data: activities }, { data: posts }] = await Promise.all([
-    sb.from('site_content').select('key,value'),
-    sb.from('categories').select('*').eq('visible', true).order('sort_order'),
-    sb
-      .from('activities')
-      .select('*, sessions(*)')
-      .eq('visible', true),
-    sb.from('posts').select('*').eq('visible', true).order('published_at', { ascending: false }).limit(3),
-  ]);
+// ---------------------------------------------------------------------------
+// Header + tab bar (persistentes, se re-renderizan por vista para marcar activo)
+// ---------------------------------------------------------------------------
+function renderChrome(activeTab) {
+  document.getElementById('site-header').innerHTML = `
+    <a href="#/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <img src="${assetUrl('assets/poloniapp-symbol.svg')}" alt="poloniapp">
+      <span class="wordmark">poloniapp</span>
+    </a>`;
+  const tabs = [
+    { href: '#/', label: 'Inicio', key: 'home' },
+    { href: '#/actividades', label: 'Actividades', key: 'actividades' },
+    { href: '#/quienes-somos', label: 'Quiénes somos', key: 'quienes-somos' },
+  ];
+  document.getElementById('tabbar').innerHTML = tabs
+    .map((t) => `<a href="${t.href}" class="${t.key === activeTab ? 'active' : ''}">${t.label}</a>`)
+    .join('');
+}
 
-  const contentMap = Object.fromEntries((content || []).map((c) => [c.key, c.value]));
-  const categoriesById = Object.fromEntries((categories || []).map((c) => [c.id, c]));
+// ---------------------------------------------------------------------------
+// Vista: Home
+// ---------------------------------------------------------------------------
+function renderHome() {
+  renderChrome('home');
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <section class="hero">
+      <h1>${esc(state.content['hero.title'])}</h1>
+      <p>${esc(state.content['hero.subtitle'])}</p>
+    </section>
+    <nav class="chips" id="chips"></nav>
+    <nav class="subchips" id="subchips"></nav>
+    <section class="section"><h2 class="section-title">Actividades</h2></section>
+    <div class="activities-grid" id="activities-grid"></div>
+    <a class="see-all" href="#/actividades">ver todas →</a>
+    <section class="section"><h2 class="section-title">Publicaciones de O. <span class="badge-sync">sync diario</span></h2></section>
+    <div class="posts-list">${state.posts.map(postCard).join('')}</div>
+    <div class="about-teaser">
+      <h2>Quiénes somos</h2>
+      <p>${esc(state.content['quienes_somos.teaser'])}</p>
+      <a href="#/quienes-somos">conocer el centro →</a>
+    </div>`;
 
-  document.getElementById('hero-title').textContent = contentMap['hero.title'] || '';
-  document.getElementById('hero-subtitle').textContent = contentMap['hero.subtitle'] || '';
-  document.getElementById('about-teaser-text').textContent = contentMap['quienes_somos.teaser'] || '';
-
-  // Chips: buckets únicos presentes en las categorías visibles (orden: formacion, laboral, familia)
   const bucketOrder = ['formacion', 'laboral', 'familia'];
-  const bucketsPresent = bucketOrder.filter((b) => (categories || []).some((c) => c.bucket === b));
+  const bucketsPresent = bucketOrder.filter((b) => state.categories.some((c) => c.bucket === b));
   const chipsEl = document.getElementById('chips');
   chipsEl.innerHTML =
     `<button class="chip active" data-bucket="todas">todas</button>` +
@@ -101,31 +169,22 @@ async function loadHome() {
       subchipsEl.innerHTML = '';
       return;
     }
-    const cats = (categories || []).filter((c) => c.bucket === bucket);
-    subchipsEl.innerHTML = cats
-      .map((c) => `<button class="chip" data-category="${c.id}">${c.name}</button>`)
-      .join('');
+    const cats = state.categories.filter((c) => c.bucket === bucket);
+    subchipsEl.innerHTML = cats.map((c) => `<button class="chip" data-category="${c.id}">${esc(c.name)}</button>`).join('');
   }
 
   function renderActivities(filterCategoryId, filterBucket) {
-    let list = activities || [];
+    let list = state.activities;
     if (filterCategoryId) {
       list = list.filter((a) => a.category_id === filterCategoryId);
     } else if (filterBucket && filterBucket !== 'todas') {
-      list = list.filter((a) => categoriesById[a.category_id]?.bucket === filterBucket);
+      list = list.filter((a) => state.categoriesById[a.category_id]?.bucket === filterBucket);
     }
-    // Actividades sin foto (Círculos) al final, igual que en producción hoy.
     list = [...list].sort((x, y) => (x.photo_url ? 0 : 1) - (y.photo_url ? 0 : 1));
-    const gridEl = document.getElementById('activities-grid');
-    gridEl.innerHTML = list
-      .slice(0, 4)
-      .map((a) => activityCard(a, categoriesById[a.category_id]))
-      .join('');
+    document.getElementById('activities-grid').innerHTML = list.slice(0, 4).map(activityCard).join('');
   }
 
-  // Default: prefiltrado en "formación / espiritual" (ver DECISIONS.md)
   const defaultBucket = bucketsPresent.includes('formacion') ? 'formacion' : 'todas';
-  chipsEl.querySelector('.chip.active')?.classList.remove('active');
   chipsEl.querySelector(`[data-bucket="${defaultBucket}"]`)?.classList.add('active');
   renderSubchips(defaultBucket);
   renderActivities(null, defaultBucket);
@@ -135,9 +194,8 @@ async function loadHome() {
     if (!btn) return;
     chipsEl.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
     btn.classList.add('active');
-    const bucket = btn.dataset.bucket;
-    renderSubchips(bucket);
-    renderActivities(null, bucket);
+    renderSubchips(btn.dataset.bucket);
+    renderActivities(null, btn.dataset.bucket);
   });
 
   subchipsEl.addEventListener('click', (e) => {
@@ -147,14 +205,180 @@ async function loadHome() {
     btn.classList.add('active');
     renderActivities(btn.dataset.category, null);
   });
-
-  document.getElementById('posts-list').innerHTML = (posts || []).map(postCard).join('');
 }
 
-loadHome().catch((err) => {
-  console.error('[poloniapp] error cargando Home:', err);
-  document.querySelector('.app').insertAdjacentHTML(
-    'afterbegin',
-    `<p class="loading-note">No se pudo cargar el contenido. Intentá recargar la página.</p>`
-  );
-});
+// ---------------------------------------------------------------------------
+// Vista: grilla de categorías (Actividades)
+// ---------------------------------------------------------------------------
+function renderCategorias() {
+  renderChrome('actividades');
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <section class="hero" style="padding-bottom:8px;">
+      <h1 style="font-size:1.3rem;">Actividades</h1>
+    </section>
+    <div class="categories-grid">
+      ${state.categories
+        .filter((c) => c.slug !== 'publicaciones')
+        .map((c) => {
+          const count = state.activities.filter((a) => a.category_id === c.id).length;
+          return `
+            <a class="category-card" href="#/actividades/${c.slug}">
+              <p class="cat-name">${esc(c.name)}</p>
+              <p class="cat-count">${count > 0 ? `${count} actividad${count > 1 ? 'es' : ''}` : 'próximamente'}</p>
+            </a>`;
+        })
+        .join('')}
+    </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Vista: lista de actividades de una categoría
+// ---------------------------------------------------------------------------
+function renderCategoria(slug) {
+  renderChrome('actividades');
+  const category = state.categories.find((c) => c.slug === slug);
+  const view = document.getElementById('view');
+  if (!category) {
+    view.innerHTML = `<p class="loading-note">Categoría no encontrada. <a href="#/actividades">Volver</a></p>`;
+    return;
+  }
+  const list = state.activities
+    .filter((a) => a.category_id === category.id)
+    .sort((a, b) => {
+      const sa = nextSession(a);
+      const sb_ = nextSession(b);
+      const da = sa?.date || (sa?.weekday ? '9999-' + WEEKDAY_ORDER.indexOf(sa.weekday) : '');
+      const db = sb_?.date || (sb_?.weekday ? '9999-' + WEEKDAY_ORDER.indexOf(sb_.weekday) : '');
+      return String(da).localeCompare(String(db));
+    });
+
+  view.innerHTML = `
+    <section class="hero" style="padding-bottom:8px;">
+      <a href="#/actividades" style="font-size:0.8rem;color:var(--color-primary);text-decoration:none;">← volver</a>
+      <h1 style="font-size:1.3rem;margin-top:8px;">${esc(category.name)}</h1>
+      ${category.description ? `<p>${esc(category.description)}</p>` : ''}
+    </section>
+    ${
+      list.length === 0
+        ? `<p class="loading-note">Todavía no hay actividades cargadas en esta categoría — próximamente.</p>`
+        : `<div class="activities-list">${list.map(activityListRow).join('')}</div>`
+    }`;
+}
+
+function activityListRow(a) {
+  const when = fmtWhen(nextSession(a));
+  return `
+    <a class="activity-row" href="#/actividad/${a.id}">
+      <div class="thumb ${a.photo_url ? '' : 'placeholder'}" style="${a.photo_url ? `background-image:url('${assetUrl(a.photo_url)}')` : ''}">
+        ${a.photo_url ? '' : `<img src="${assetUrl('assets/poloniapp-symbol.svg')}" alt="">`}
+      </div>
+      <div>
+        <p class="title">${esc(a.title)}</p>
+        <p class="when">${esc(when)}</p>
+      </div>
+    </a>`;
+}
+
+// ---------------------------------------------------------------------------
+// Vista: detalle de actividad
+// ---------------------------------------------------------------------------
+async function renderActividad(id) {
+  renderChrome('actividades');
+  const view = document.getElementById('view');
+  const activity = state.activities.find((a) => a.id === id);
+  if (!activity) {
+    view.innerHTML = `<p class="loading-note">Actividad no encontrada. <a href="#/actividades">Volver</a></p>`;
+    return;
+  }
+  const category = state.categoriesById[activity.category_id];
+  view.innerHTML = `<p class="loading-note">Cargando…</p>`;
+
+  const locationIds = [...new Set((activity.sessions || []).map((s) => s.location_id).filter(Boolean))];
+  let locationsById = {};
+  if (locationIds.length) {
+    const { data: locs } = await sb.from('locations_public').select('id,name').in('id', locationIds);
+    locationsById = Object.fromEntries((locs || []).map((l) => [l.id, l.name]));
+  }
+
+  const sessions = [...(activity.sessions || [])].sort((a, b) => {
+    const da = a.date || '9999-' + WEEKDAY_ORDER.indexOf(a.weekday);
+    const db = b.date || '9999-' + WEEKDAY_ORDER.indexOf(b.weekday);
+    return String(da).localeCompare(String(db));
+  });
+
+  view.innerHTML = `
+    <section class="hero" style="padding-bottom:8px;">
+      <a href="#/actividades/${category?.slug || ''}" style="font-size:0.8rem;color:var(--color-primary);text-decoration:none;">← ${esc(category?.name || 'volver')}</a>
+    </section>
+    ${
+      activity.photo_url
+        ? `<div class="detail-photo" style="background-image:url('${assetUrl(activity.photo_url)}')"></div>`
+        : `<div class="detail-photo placeholder"><img src="${assetUrl('assets/poloniapp-symbol.svg')}" alt=""></div>`
+    }
+    <section class="section">
+      <h1 class="section-title" style="font-size:1.3rem;">${esc(activity.title)}</h1>
+      ${activity.description ? `<p style="font-size:0.9rem;color:#4d4d48;line-height:1.4;">${esc(activity.description)}</p>` : ''}
+    </section>
+    <div class="sessions-list">
+      ${sessions
+        .map(
+          (s) => `
+        <div class="session-row">
+          <p class="when">${esc(fmtWhen(s))}${s.time_end ? ' – ' + esc(s.time_end.slice(0, 5)) : ''}</p>
+          ${s.topic ? `<p class="topic">${esc(s.topic)}</p>` : ''}
+          ${s.speaker ? `<p class="speaker">${esc(s.speaker)}</p>` : ''}
+          <p class="location">${s.location_id && locationsById[s.location_id] ? esc(locationsById[s.location_id]) : ''} — dirección disponible al inscribirte</p>
+          ${s.price ? `<p class="price">${esc(s.price)}</p>` : ''}
+        </div>`
+        )
+        .join('')}
+    </div>
+    <div class="section">
+      <button class="cta-inscribir" disabled title="Próximamente">Inscribirme (próximamente)</button>
+    </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Vista: Quiénes somos
+// ---------------------------------------------------------------------------
+function renderQuienesSomos() {
+  renderChrome('quienes-somos');
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <section class="hero">
+      <h1 style="font-size:1.3rem;">Quiénes somos</h1>
+      <p>${esc(state.content['quienes_somos.objetivo'])}</p>
+    </section>
+    <section class="section">
+      <p style="font-size:0.9rem;color:#4d4d48;line-height:1.5;">${esc(state.content['quienes_somos.teaser'])}</p>
+    </section>`;
+}
+
+// ---------------------------------------------------------------------------
+// Router
+// ---------------------------------------------------------------------------
+function route() {
+  const hash = location.hash.replace(/^#\/?/, '');
+  const parts = hash.split('/').filter(Boolean);
+  window.scrollTo(0, 0);
+  if (parts.length === 0) return renderHome();
+  if (parts[0] === 'actividades' && parts.length === 1) return renderCategorias();
+  if (parts[0] === 'actividades' && parts.length === 2) return renderCategoria(parts[1]);
+  if (parts[0] === 'actividad' && parts[1]) return renderActividad(parts[1]);
+  if (parts[0] === 'quienes-somos') return renderQuienesSomos();
+  return renderHome();
+}
+
+async function init() {
+  try {
+    await loadData();
+    window.addEventListener('hashchange', route);
+    route();
+  } catch (err) {
+    console.error('[poloniapp] error cargando datos:', err);
+    document.getElementById('view').innerHTML = `<p class="loading-note">No se pudo cargar el contenido. Intentá recargar la página.</p>`;
+  }
+}
+
+init();
