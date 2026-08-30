@@ -347,14 +347,35 @@ async function renderActividad(id) {
 function renderQuienesSomos() {
   renderChrome('quienes-somos');
   const view = document.getElementById('view');
+  const imagen = state.content['quienes_somos.imagen'];
+  const categoriasList = state.categories.filter((c) => c.slug !== 'publicaciones').map((c) => c.name);
+  const address = state.content['contact.address'];
+  const mapUrl = state.content['contact.map_url'];
+
   view.innerHTML = `
     <section class="hero">
       <h1 style="font-size:1.3rem;">Quiénes somos</h1>
-      <p>${esc(state.content['quienes_somos.objetivo'])}</p>
     </section>
     <section class="section">
-      <p style="font-size:0.9rem;color:#4d4d48;line-height:1.5;">${esc(state.content['quienes_somos.teaser'])}</p>
-    </section>`;
+      <p class="about-p">${esc(state.content['quienes_somos.parrafo1'])}</p>
+    </section>
+    ${imagen ? `<div class="about-photo" style="background-image:url('${assetUrl(imagen)}')"></div>` : ''}
+    <section class="section">
+      <p class="about-p">${esc(state.content['quienes_somos.parrafo2'])}</p>
+    </section>
+    <section class="section about-block">
+      <h2 class="section-title" style="font-size:0.85rem;letter-spacing:0.04em;color:#8a8a84;text-transform:uppercase;">Qué se hace acá</h2>
+      <ul class="about-list">${categoriasList.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
+    </section>
+    ${
+      address
+        ? `<section class="section about-block">
+      <h2 class="section-title" style="font-size:0.85rem;letter-spacing:0.04em;color:#8a8a84;text-transform:uppercase;">Cómo llegar</h2>
+      <p class="about-p">${esc(address)}</p>
+      ${mapUrl ? `<a href="${esc(mapUrl)}" target="_blank" rel="noopener" class="see-all" style="text-align:left;padding:0;">ver en el mapa →</a>` : ''}
+    </section>`
+        : ''
+    }`;
 }
 
 // ---------------------------------------------------------------------------

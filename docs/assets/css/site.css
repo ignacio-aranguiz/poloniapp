@@ -277,6 +277,32 @@ body {
 .session-row .speaker { margin: 0 0 4px; font-size: 0.8rem; color: #6b6b66; }
 .session-row .location { margin: 0; font-size: 0.78rem; color: #8a8a84; }
 .session-row .price { margin: 4px 0 0; font-size: 0.8rem; font-weight: 600; color: var(--color-primary); }
+/* --- Quiénes somos (vista completa) --- */
+.about-p { margin: 0; font-size: 0.9rem; color: #4d4d48; line-height: 1.5; }
+.about-photo {
+  margin: 4px 20px 4px;
+  border-radius: var(--radius-card);
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-tag-bg);
+}
+.about-block { border-top: 1px solid #eee2cd; padding-top: 16px; margin-top: 8px; }
+.about-list { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.about-list li {
+  font-size: 0.9rem;
+  padding-left: 16px;
+  position: relative;
+}
+.about-list li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
 /* --- Bubble chat (WhatsApp) --- */
 .chat-bubble {
   position: fixed;

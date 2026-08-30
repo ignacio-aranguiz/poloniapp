@@ -10,7 +10,12 @@ insert into site_content (key, section, value) values
   ('hero.subtitle', 'Hero', 'Buscar a Dios en la vida ordinaria, y darlo a conocer.'),
   ('quienes_somos.teaser', 'Quiénes somos', 'Centro cultural del Opus Dei en Las Condes. Círculos, retiros, charlas y confesiones, siempre en el trato de a uno.'),
   ('quienes_somos.objetivo', 'Quiénes somos', 'Buscar a Dios en la vida ordinaria, y darlo a conocer.'),
-  ('contact.whatsapp', 'Contacto', '+56953719944')
+  ('quienes_somos.parrafo1', 'Quiénes somos', 'Somos un centro cultural en Las Condes donde profesionales jóvenes encuentran formación espiritual y humana. Funciona a puertas abiertas: se viene, se conversa, se vuelve.'),
+  ('quienes_somos.imagen', 'Quiénes somos', ''),
+  ('quienes_somos.parrafo2', 'Quiénes somos', 'El centro forma parte del Opus Dei. Buscar a Cristo, encontrarlo y amarlo — como lo resumía san Josemaría — es la idea que ordena toda la formación que ofrecemos: un plan adaptado a cada persona, que abarca lo humano, lo espiritual, lo doctrinal, lo profesional y lo apostólico. No hace falta llegar con todo resuelto: la actitud que proponemos es simple, comenzar y, cuando haga falta, recomenzar.'),
+  ('contact.whatsapp', 'Contacto', '+56953719944'),
+  ('contact.address', 'Contacto', 'Polonia 306, Las Condes'),
+  ('contact.map_url', 'Contacto', 'https://maps.google.com/?q=Polonia+306,+Las+Condes')
 on conflict (key) do nothing;
 
 -- =========================================================
