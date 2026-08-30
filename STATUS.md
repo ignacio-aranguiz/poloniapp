@@ -1,6 +1,6 @@
 # STATUS — poloniapp
 
-**Fase:** iteración-v1 — navegación por categoría deployada (contenido real, símbolo, publicaciones y grilla de categorías ya en producción; falta backend/portal admin y "Textos diarios")
+**Fase:** iteración-v1 → backend/data-driven en construcción (2026-08-30): Supabase creado y Home data-driven ya funcionando en `/preview/`, pendientes 2b-2c (navegación completa) + panel admin + scraper
 **Madurez:** 2/5
 
 ## Qué es
@@ -27,17 +27,25 @@ Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 
 - **Sección "Textos diarios"** — decidida hace varias rondas (card que redirige a opusdei.org/es-cl/dailytext, mismo patrón que Publicaciones), **nunca se implementó**. Pendiente real, no solo de wording.
 - **"Qué se hace acá" en Quiénes somos** — hoy comprime 7 categorías en 4 bullets del template viejo; expandir a las 7 (o 5 visibles, ver nota de Visitas/Colectas) cuando se toque esa sección de nuevo.
 
+## Backend / panel admin / scraper — en ejecución (2026-08-30)
+Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-pensando-en-como-transient-bee.md`.
+- **✅ Fase 1 — Supabase:** proyecto `poloniapp` creado (São Paulo), schema completo + RLS corrido (`supabase/schema.sql`), admin cargado, contenido real migrado (`supabase/seed.sql`).
+- **✅ Fase 2a — Home data-driven:** `docs/index.html` dejó de ser el export bundlado de Claude Design — reescrito a mano (HTML/CSS/JS simple, sin runtime bundler) con fetch client-side a Supabase. Viendo en `/preview/` (no en la raíz todavía, ver nota de deploy abajo).
+- **Pendiente 2b:** navegación real Home → Actividades → detalle (hoy son placeholders `href="#"`).
+- **Pendiente 2c:** bubble chat → WhatsApp (falta el link real del centro).
+- **Pendiente Fase 3:** panel admin `docs/admin/` (SPA formularios, Supabase Auth email+password).
+- **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend).
+- **Pendiente Fase 5:** scraper opusdei.org (GitHub Actions) → habilita "Textos diarios" con contenido real.
+- **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo) mientras se completan 2b-2c. Swap a la raíz pendiente de decisión explícita.
+
 ## Próximos pasos (no wording)
-- Integrar el resultado de Claude Design de `NAVIGATION_BRIEF.md` (ver arriba).
-- Implementar la sección "Textos diarios" (card + link afuera, sin scraping).
-- Definir stack técnico real del backend + portal admin (Supabase/similar, liviano, 1-3 admins) — incluye modelar el gate de privacidad de direcciones (visibles solo post-inscripción, ya aplicado como texto en Encuentro de Matrimonios).
-- Scraper de publicaciones de O. — **fase 2**, fuera de v1.
+- Seguir el plan de backend/admin/scraper de arriba: 2b → 2c → swap a raíz → Fase 3 → Fase 4 → Fase 5.
 - Conseguir del equipo del centro: link real de WhatsApp (el botón hoy no tiene destino).
 - Implementar tracking de clics en bubble chat (recomendación del brief original: Google Sheets vía Apps Script Web App).
 - Reactivar Visitas a los pobres / Colectas cuando haya decisión — el texto ya está listo en `DECISIONS.md`, no reinventar.
 
 ## Blockers
-- Ninguno bloqueante — falta el resultado de la ronda de Claude Design en curso, decisión de stack de backend, y el link de WhatsApp real.
+- Ninguno bloqueante — falta ejecutar el plan de backend (arriba) y el link de WhatsApp real.
 
 ## Documentos del proyecto — qué es cada uno
 - `PROJECT_BRIEF.md` — brief de producto original (v0).

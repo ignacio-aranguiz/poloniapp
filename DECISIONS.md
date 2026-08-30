@@ -4,6 +4,53 @@ Log vivo de decisiones de diseño, UX/UI y estructura de contenido tomadas en se
 
 ---
 
+## 2026-08-30 — Ronda 8: ejecución Fase 1 + 2a (Supabase + Home data-driven)
+
+### Fase 1 — Supabase
+Proyecto `poloniapp` creado (São Paulo), `supabase/schema.sql` corrido completo (9 tablas, RLS, `is_admin()`, RPC `register_and_reveal_address`), admin cargado.
+- **Ajuste de schema encontrado durante el seed real:** `sessions.date` no podía ser `not null` — Círculos son recurrentes sin fecha absoluta ("Lunes · 08:00"). Se agregó `sessions.weekday` (nullable) + constraint `date is not null or weekday is not null`. No se modela recurrencia real (próxima ocurrencia calculada) porque el sitio solo necesita mostrar el texto, no calcular fechas futuras.
+- `supabase/seed.sql` migra todo el contenido hoy real: site_content (hero/quiénes somos), 9 categorías, 3 ubicaciones, 6 actividades + sesiones, 3 publicaciones.
+
+### Fase 2a — Home data-driven
+`docs/index.html` (el export bundlado de Claude Design, con runtime de reconstrucción de DOM propio) se descubrió que **no era el sitio real** sino el wrapper de preview del prototipo de Claude Design (marco de teléfono, "Prototipo navegable") — confirmado también contra la guía pública de Anthropic: el export standalone HTML de Claude Design está pensado como prototipo, no como destino de producción; el workflow recomendado es handoff a Claude Code para reimplementar como código real.
+- Se reescribió a mano: `docs/assets/css/site.css` + `docs/assets/js/app.js` (fetch client-side a Supabase, sin build step) + `docs/index.html` limpio.
+- Rutas de assets (fotos, símbolo) resueltas vía `import.meta.url` en vez de rutas relativas fijas, para que funcionen igual sin importar la profundidad de la página que las carga (raíz o `/preview/`).
+- **Deploy sin romper producción:** el build nuevo se pusheó a `docs/preview/` (`.../poloniapp/preview/`), dejando `docs/index.html` de la raíz intacto (el bundle viejo sigue siendo lo que ve el público) hasta decidir el swap.
+- Pendiente: 2b (navegación Home→Actividades→detalle), 2c (bubble chat→WhatsApp), luego swap a raíz.
+
+---
+
+## 2026-08-30 — Ronda 7: plan de backend, panel admin y jobs de contenido
+
+Plan completo ejecutado en `/Users/ignacio_aranguiz/.claude/plans/estuve-pensando-en-como-transient-bee.md` — este resumen registra las decisiones cerradas, el detalle técnico (modelo de datos, RLS, fases) vive en el archivo de plan.
+
+### Motivo
+Los admins del centro (1-3 personas, no devs) necesitan poder cargar/editar actividades y textos sin depender de Ignacio. Hasta ahora el único modo de cambiar contenido era pedir un nuevo export de Claude Design y reemplazar `docs/index.html` — cuello de botella total.
+
+### Pivot de arquitectura — **actualiza la Ronda 1**
+- `docs/index.html` deja de ser la fuente de verdad del contenido. Pasa a ser un frontend **data-driven**: el look & feel (HTML/CSS) se mantiene, pero todo el texto del sitio (hero, "Quiénes somos", descripciones de categoría, actividades, publicaciones) vive en Supabase y se renderiza en runtime vía fetch client-side.
+- Claude Design deja de ser el canal para cambios de *contenido* — sigue siendo el canal para cambios de *diseño/layout* visual.
+- Panel admin: vista separada simple (`docs/admin/`) con formularios, **no** edición inline sobre las vistas públicas (se evaluó y se descartó por mayor complejidad de frontend sin beneficio claro para 1-3 admins no-devs).
+
+### Scraper de opusdei.org — **actualiza la Ronda 1** ("fuera de alcance v1, fase 2")
+- Se levanta esa restricción: esta ronda diseña **y deja listo para construir** el job (texto diario + publicaciones nuevas), no solo el diseño.
+- Corre en GitHub Actions, cron diario, en el mismo repo público de poloniapp — se evaluó separarlo en repo privado y se descartó: el scraper solo lee páginas públicas de opusdei.org, no hay lógica sensible; lo único sensible (la `service_role` key de Supabase) queda en GitHub Secrets, nunca en el código.
+- Habilita por fin la vista real de "Textos diarios" en el sitio (pendiente documentada en `STATUS.md` desde hace varias rondas) — mismo patrón que Publicaciones: excerpt en el sitio + link "leer completo" afuera, sin vista de detalle propia.
+
+### Inscripciones y gate de privacidad de direcciones — se construye ahora (no solo se modela)
+- Se agrega el flujo público de inscripción (nombre/email/teléfono) además del esquema de datos — antes solo se iba a modelar la tabla.
+- Resuelto sin requerir cuentas de usuario final: una función Postgres (`register_and_reveal_address`) inserta la inscripción y devuelve la dirección real en la misma respuesta. La dirección nunca es legible vía `select` público — RLS la protege a nivel de base de datos, no solo ocultándola en la UI.
+
+### Stack y hosting — confirmados
+- Backend: Supabase free tier (Postgres + Auth + RLS; Storage opcional para fotos).
+- Auth admins: Supabase Auth, email + password (alcanza para 1-3 personas de confianza, sin sistema de roles).
+- Hosting frontend: se mantiene **GitHub Pages** — se evaluó Vercel/Netlify y se descartó, el sitio sigue siendo estático (el fetch a Supabase ocurre en el cliente), no hay build step ni SSR que justifique migrar.
+
+### Próximo paso
+Fase 1 del plan: crear proyecto Supabase, definir schema completo + RLS, migrar el contenido hoy hardcodeado en `docs/index.html` a las tablas.
+
+---
+
 ## 2026-08-29 — Ronda 1: marco de iteración v0 → v1
 
 ### Qué se mantiene del v0
