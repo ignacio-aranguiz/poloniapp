@@ -3,29 +3,35 @@
 ## Links rápidos
 | Link | Para qué sirve |
 |---|---|
-| https://ignacio-aranguiz.github.io/poloniapp/ | Sitio en producción — lo que ve el público hoy (bundle viejo, sin tocar) |
-| https://ignacio-aranguiz.github.io/poloniapp/preview/ | Build nuevo data-driven — para validar antes del swap a la raíz |
+| https://ignacio-aranguiz.github.io/poloniapp/ | Sitio en producción — build nuevo data-driven (swap 2026-09-05) |
 | https://ignacio-aranguiz.github.io/poloniapp/admin/ | Panel admin — login con email + password de Supabase Auth |
 | https://ignacio-aranguiz.github.io/poloniapp/manual/ | Guía paso a paso para los admins (con capturas reales) |
 | https://github.com/ignacio-aranguiz/poloniapp | Repo del código |
 | https://supabase.com/dashboard/project/xxnepqgoirkvikngqnii | Proyecto Supabase — SQL Editor, Table Editor, Auth, Storage |
 | https://poloniasub35.setmore.com | Sistema de reservas de confesiones (externo al proyecto, solo enlazado) |
 
-**Fase:** iteración-v1 → backend/data-driven (2026-08-30): Fases 1, 2 (a+b+c), 3 y 5 completas y viendo en `/preview/` + `/admin/`; pendiente Fase 4 (inscripciones, bloqueada por feedback de otros admins) y el swap a la raíz
-**Madurez:** 3/5
+**Fase:** iteración-v1 → backend/data-driven — **swap a producción hecho (2026-09-05)**: Fases 1, 2 (a+b+c), 3 y 5 en la raíz; pendiente Fase 4 (inscripciones, bloqueada por feedback de otros admins, reunión ~2026-09-13)
+**Madurez:** 4/5
 
 ## Qué es
 Web app informativa (MVP) para un centro cultural del O. en Las Condes (Polonia 306) — capa de identidad, feed de actividades propias por categoría (con detalle propio) + sección secundaria de publicaciones de O. (redirige afuera) + sección "Texto diario" (redirige afuera) + tarjeta de reserva de Confesiones (redirige a Setmore) + bubble chat de contacto a WhatsApp. Ver `PROJECT_BRIEF.md` para el scope original y `DESIGN_BRIEF.md` para la arquitectura de información y paleta visual del v0. **`DECISIONS.md` es la fuente de verdad de todo lo que cambió sobre esos dos documentos durante la iteración v1** — leerlo siempre antes de asumir el estado del contenido/UX.
 
 ## Deploy
-- **Producción (bundle viejo, sin tocar todavía):** https://ignacio-aranguiz.github.io/poloniapp/
-- **Preview (build nuevo, data-driven):** https://ignacio-aranguiz.github.io/poloniapp/preview/
+- **Producción (build nuevo, data-driven):** https://ignacio-aranguiz.github.io/poloniapp/
+- **Bundle viejo (respaldo post-swap):** `docs/legacy/index.html` (no servido, queda en el repo; también existe el tag de git `v0-mockup-backup` con el estado previo a toda la iteración v1).
 - **Panel admin:** https://ignacio-aranguiz.github.io/poloniapp/admin/ (login Supabase Auth)
 - **Manual para admins:** https://ignacio-aranguiz.github.io/poloniapp/manual/
 - **Repo:** https://github.com/ignacio-aranguiz/poloniapp (público, requerido por GitHub Pages free)
 - Fuente: `main` / `docs`.
 - **Backend:** Supabase, proyecto `poloniapp` (São Paulo) — URL y keys en `docs/assets/js/config.js` (anon, pública) y en Supabase dashboard (service_role, nunca en el repo).
 - **Backup del v0** (antes de toda la iteración v1) disponible en el tag de git `v0-mockup-backup`.
+- **Reset de password de un admin (fallback manual, vía SQL Editor de Supabase — Postgres):**
+  ```sql
+  update auth.users
+  set encrypted_password = crypt('nueva-password', gen_salt('bf'))
+  where email = 'el-email-del-admin@...';
+  ```
+  Requiere la extensión `pgcrypto` (Supabase la trae habilitada por default). Usar solo desde el SQL Editor del dashboard (nunca exponer esto en el frontend ni en un endpoint).
 
 ## Qué ya está integrado y en producción (raíz — bundle viejo)
 - Responsivo mobile (2026-08-16).
@@ -54,11 +60,10 @@ Ronda 7 de `DECISIONS.md`. Plan: `/Users/ignacio_aranguiz/.claude/plans/estuve-p
 - **Manual para admins:** `docs/manual/` (endpoint público, con capturas reales), explica cómo entrar, editar texto, subir imagen, ver el resultado.
 - **Pendiente Fase 4:** flujo público de inscripción + RPC `register_and_reveal_address` (ya está en el schema, falta cablear en el frontend) — a la espera de feedback de los otros admins (reunión en ~2 semanas, 2026-09-13).
 - **✅ Fase 5 (pivot):** el scraper automático no es viable — opusdei.org corre atrás de Cloudflare con challenge JS en todas las rutas (sitio, /feed, /rss.xml). "Texto diario" pasa a carga manual desde el admin (mismo patrón que Publicaciones), con su sección ya viva en la Home pública.
-- **Nota de deploy:** el build nuevo vive en `docs/preview/` (`https://ignacio-aranguiz.github.io/poloniapp/preview/`) para no romper la home en producción (`docs/index.html` raíz sigue siendo el bundle viejo). Swap a la raíz pendiente de decisión explícita.
+- **✅ Swap a producción (2026-09-05):** `docs/preview/index.html` pasó a ser `docs/index.html` (rutas relativas `../assets/` → `assets/`, se sacó el `<meta robots noindex>` y el "(preview)" del `<title>`). El bundle viejo quedó en `docs/legacy/index.html` como respaldo rápido.
 
 ## Próximos pasos (no wording)
 - Fase 4 (inscripciones) — retomar después de la reunión con los otros admins (~2026-09-13).
-- Swap `docs/preview/` → raíz cuando el usuario lo decida explícitamente.
 - Implementar tracking de clics en bubble chat (recomendación del brief original: Google Sheets vía Apps Script Web App).
 - Reactivar Visitas a los pobres / Colectas cuando haya decisión — el texto ya está listo en `DECISIONS.md`, no reinventar.
 
